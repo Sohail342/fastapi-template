@@ -14,7 +14,7 @@ This CLI tool provides three different templates to quickly bootstrap FastAPI ap
 
 ### From PyPI (when published)
 ```bash
-pip install fastapi-cli-tool
+pip install fastapi-template-cli
 ```
 
 ### From Source
@@ -29,13 +29,13 @@ pip install -e .
 ### Basic Usage
 ```bash
 # Create a new FastAPI project
-fastapi-cli create my-project
+fastapi-template create my-project
 
 # Create with specific template
-fastapi-cli create my-project --template fullstack
+fastapi-template create my-project --template fullstack
 
 # List available templates
-fastapi-cli templates
+fastapi-template templates
 ```
 
 ### Available Templates
@@ -46,7 +46,7 @@ fastapi-cli templates
 - Perfect for learning and simple projects
 
 ```bash
-fastapi-cli create my-minimal-app --template minimal
+fastapi-template create my-minimal-app --template minimal
 ```
 
 #### 2. API Only Template
@@ -57,7 +57,7 @@ fastapi-cli create my-minimal-app --template minimal
 - API documentation
 
 ```bash
-fastapi-cli create my-api-app --template api_only
+fastapi-template create my-api-app --template api_only
 ```
 
 #### 3. Full-Stack Template
@@ -71,23 +71,23 @@ fastapi-cli create my-api-app --template api_only
 - CI/CD ready
 
 ```bash
-fastapi-cli create my-fullstack-app --template fullstack
+fastapi-template create my-fullstack-app --template fullstack
 ```
 
 ### CLI Commands
 
 ```bash
 # Create new project
-fastapi-cli create <project-name> [--template TEMPLATE]
+fastapi-template create <project-name> [--template TEMPLATE]
 
 # List available templates
-fastapi-cli templates
+fastapi-template templates
 
 # Show version
-fastapi-cli --version
+fastapi-template --version
 
 # Show help
-fastapi-cli --help
+fastapi-template --help
 ```
 
 ## Template Details
