@@ -29,10 +29,10 @@ pip install -e .
 ### Basic Usage
 ```bash
 # Create a new FastAPI project
-fastapi-template create my-project
+fastapi-template new my-project
 
 # Create with specific template
-fastapi-template create my-project --template fullstack
+fastapi-template new my-project --template fullstack
 
 # List available templates
 fastapi-template templates
@@ -46,7 +46,7 @@ fastapi-template templates
 - Perfect for learning and simple projects
 
 ```bash
-fastapi-template create my-minimal-app --template minimal
+fastapi-template new my-minimal-app --template minimal
 ```
 
 #### 2. API Only Template
@@ -57,7 +57,7 @@ fastapi-template create my-minimal-app --template minimal
 - API documentation
 
 ```bash
-fastapi-template create my-api-app --template api_only
+fastapi-template new my-api-app --template api_only
 ```
 
 #### 3. Full-Stack Template
@@ -71,14 +71,14 @@ fastapi-template create my-api-app --template api_only
 - CI/CD ready
 
 ```bash
-fastapi-template create my-fullstack-app --template fullstack
+fastapi-template new my-fullstack-app --template fullstack
 ```
 
 ### CLI Commands
 
 ```bash
 # Create new project
-fastapi-template create <project-name> [--template TEMPLATE]
+fastapi-template new <project-name> [--template TEMPLATE]
 
 # List available templates
 fastapi-template templates
