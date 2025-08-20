@@ -19,7 +19,7 @@ pip install fastapi-cli-tool
 
 ### From Source
 ```bash
-git clone <repository-url>
+git clone https://github.com/Sohail342/fastapi-template
 cd cli-tool
 pip install -e .
 ```
