@@ -19,7 +19,7 @@ pip install fastapi-template-cli
 
 ### From Source
 ```bash
-git clone https://github.com/Sohail342/fastapi-template
+git clone https://github.com/Sohail342/fastapi-template.git
 cd cli-tool
 pip install -e .
 ```
@@ -148,7 +148,7 @@ fastapi-template --help
 
 ### Setup Development Environment
 ```bash
-git clone <repository-url>
+git clone https://github.com/Sohail342/fastapi-template.git
 cd cli-tool
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
