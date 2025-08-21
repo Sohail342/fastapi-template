@@ -3,12 +3,12 @@ Tests for authentication endpoints.
 """
 
 import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
-
 from app.core.config import settings
 from app.core.security import verify_password
 from app.crud.user import user as crud_user
+from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
+
 from tests.utils.user import create_test_user
 
 
@@ -18,7 +18,7 @@ def test_register_user(client: TestClient, session: Session) -> None:
         "email": "newuser@example.com",
         "password": "testpassword",
         "full_name": "New User",
-        "username": "newuser"
+        "username": "newuser",
     }
     response = client.post(
         f"{settings.API_V1_STR}/auth/register",
@@ -37,7 +37,7 @@ def test_register_user_existing_email(client: TestClient, session: Session) -> N
         "email": "existing@example.com",
         "password": "testpassword",
         "full_name": "Existing User",
-        "username": "existing"
+        "username": "existing",
     }
     response = client.post(
         f"{settings.API_V1_STR}/auth/register",
@@ -85,7 +85,7 @@ def test_login_inactive_user(client: TestClient, session: Session) -> None:
     user.is_active = False
     session.add(user)
     session.commit()
-    
+
     login_data = {
         "username": user.email,
         "password": "testpassword",

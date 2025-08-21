@@ -3,10 +3,10 @@ Tests for user endpoints.
 """
 
 import pytest
+from app.core.config import settings
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
 from tests.utils.user import create_test_user
 
 
@@ -26,9 +26,7 @@ def test_get_users_superuser_me(
     assert current_user["email"] == settings.FIRST_SUPERUSER
 
 
-def test_get_users_normal_user_me(
-    client: TestClient, session: Session
-) -> None:
+def test_get_users_normal_user_me(client: TestClient, session: Session) -> None:
     """Test get current normal user."""
     user = create_test_user(session)
     login_data = {
@@ -41,7 +39,7 @@ def test_get_users_normal_user_me(
     )
     tokens = response.json()
     headers = {"Authorization": f"Bearer {tokens['access_token']}"}
-    
+
     response = client.get(
         f"{settings.API_V1_STR}/users/me",
         headers=headers,
@@ -112,9 +110,7 @@ def test_create_user_existing_username(
     assert "Username already registered" in response.json()["detail"]
 
 
-def test_create_user_by_normal_user(
-    client: TestClient, session: Session
-) -> None:
+def test_create_user_by_normal_user(client: TestClient, session: Session) -> None:
     """Test create user by normal user (should fail)."""
     user = create_test_user(session)
     login_data = {
@@ -127,7 +123,7 @@ def test_create_user_by_normal_user(
     )
     tokens = response.json()
     headers = {"Authorization": f"Bearer {tokens['access_token']}"}
-    
+
     data = {
         "email": "newuser@example.com",
         "username": "newuser",

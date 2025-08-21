@@ -4,14 +4,13 @@ User management endpoints.
 
 from typing import Any, List
 
-from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import HTTPBearer
-
 from app import crud, schemas
 from app.api.deps import get_current_active_superuser, get_current_active_user
 from app.db.database import get_db
 from app.models.user import User
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import HTTPBearer
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 security = HTTPBearer()
@@ -26,13 +25,13 @@ def read_users(
 ) -> Any:
     """
     Retrieve users (admin only).
-    
+
     Args:
         db: Database session
         skip: Number of users to skip
         limit: Maximum number of users to return
         current_user: Current authenticated user
-        
+
     Returns:
         List of users
     """
@@ -49,12 +48,12 @@ def create_user(
 ) -> Any:
     """
     Create new user (admin only).
-    
+
     Args:
         db: Database session
         user_in: User creation data
         current_user: Current authenticated user
-        
+
     Returns:
         Created user
     """
@@ -75,11 +74,11 @@ def read_user_me(
 ) -> Any:
     """
     Get current user.
-    
+
     Args:
         db: Database session
         current_user: Current authenticated user
-        
+
     Returns:
         Current user
     """
@@ -94,12 +93,12 @@ def read_user_by_id(
 ) -> Any:
     """
     Get a specific user by ID.
-    
+
     Args:
         user_id: User ID
         current_user: Current authenticated user
         db: Database session
-        
+
     Returns:
         User
     """
@@ -107,9 +106,7 @@ def read_user_by_id(
     if user == current_user:
         return user
     if not crud.user.is_superuser(current_user):
-        raise HTTPException(
-            status_code=400, detail="Not enough permissions"
-        )
+        raise HTTPException(status_code=400, detail="Not enough permissions")
     return user
 
 
@@ -124,14 +121,14 @@ def update_user_me(
 ) -> Any:
     """
     Update own user.
-    
+
     Args:
         db: Database session
         password: New password
         full_name: New full name
         email: New email
         current_user: Current authenticated user
-        
+
     Returns:
         Updated user
     """

@@ -3,7 +3,7 @@ Health check endpoints.
 """
 
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any, Dict
 
 from fastapi import APIRouter
 
@@ -14,7 +14,7 @@ router = APIRouter()
 async def health_check() -> Dict[str, Any]:
     """
     Basic health check endpoint.
-    
+
     Returns:
         Dict containing health status and timestamp
     """
@@ -29,13 +29,13 @@ async def health_check() -> Dict[str, Any]:
 async def detailed_health() -> Dict[str, Any]:
     """
     Detailed health check with system information.
-    
+
     Returns:
         Dict containing detailed health information
     """
-    import sys
     import os
-    
+    import sys
+
     return {
         "status": "healthy",
         "timestamp": datetime.utcnow().isoformat(),

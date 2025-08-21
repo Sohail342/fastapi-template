@@ -2,12 +2,11 @@
 Database initialization script.
 """
 
-from sqlalchemy.orm import Session
-
 from app.core.config import settings
 from app.crud.user import user as crud_user
 from app.db.database import SessionLocal
 from app.schemas.user import UserCreate
+from sqlalchemy.orm import Session
 
 
 def init_db(db: Session) -> None:

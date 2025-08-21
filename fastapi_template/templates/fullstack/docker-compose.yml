@@ -27,11 +27,14 @@ services:
       - redis
     environment:
       - ENVIRONMENT=production
+      - FASTAPI_USERS_BACKEND=${FASTAPI_USERS_BACKEND:-sqlalchemy}
       - POSTGRES_SERVER=db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=fastapi_fullstack
       - REDIS_URL=redis://redis:6379/0
+      - MONGODB_URL=mongodb://mongo:27017/fastapi_fullstack
+      - DATABASE_NAME=fastapi_fullstack
     ports:
       - "8000:8000"
     volumes:

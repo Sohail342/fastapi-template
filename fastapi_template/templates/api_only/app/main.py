@@ -6,26 +6,25 @@ This demonstrates a clean, modular FastAPI structure.
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
 from app.config import settings
 from app.routers import health, items
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     Manage application lifespan events.
-    
+
     This function handles startup and shutdown events for the FastAPI app.
     """
     # Startup
     print("🚀 Starting up...")
     print(f"📋 Environment: {settings.ENVIRONMENT}")
-    
+
     yield
-    
+
     # Shutdown
     print("🛑 Shutting down...")
 

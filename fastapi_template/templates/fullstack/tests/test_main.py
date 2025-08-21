@@ -2,9 +2,8 @@
 Tests for main application.
 """
 
-from fastapi.testclient import TestClient
-
 from app.core.config import settings
+from fastapi.testclient import TestClient
 
 
 def test_root(client: TestClient) -> None:

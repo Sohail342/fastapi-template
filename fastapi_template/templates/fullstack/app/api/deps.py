@@ -4,30 +4,28 @@ API dependencies for authentication and authorization.
 
 from typing import Generator
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer
-from sqlalchemy.orm import Session
-
 from app.core import security
 from app.core.config import settings
 from app.crud.user import user as crud_user
 from app.db.database import get_db
 from app.models.user import User
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer
+from sqlalchemy.orm import Session
 
 security = HTTPBearer()
 
 
 def get_current_user(
-    db: Session = Depends(get_db),
-    token: str = Depends(security)
+    db: Session = Depends(get_db), token: str = Depends(security)
 ) -> User:
     """
     Get current authenticated user.
-    
+
     Args:
         db: Database session
         token: JWT token
-        
+
     Returns:
         Current user
     """
@@ -48,10 +46,10 @@ def get_current_active_user(
 ) -> User:
     """
     Get current active user.
-    
+
     Args:
         current_user: Current user
-        
+
     Returns:
         Active user
     """
@@ -65,15 +63,13 @@ def get_current_active_superuser(
 ) -> User:
     """
     Get current active superuser.
-    
+
     Args:
         current_user: Current user
-        
+
     Returns:
         Superuser
     """
     if not crud_user.is_superuser(current_user):
-        raise HTTPException(
-            status_code=400, detail="Not enough permissions"
-        )
+        raise HTTPException(status_code=400, detail="Not enough permissions")
     return current_user

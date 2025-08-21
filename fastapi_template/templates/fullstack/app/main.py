@@ -1,20 +1,44 @@
 """
 Main FastAPI application for Full-stack template.
-Production-ready FastAPI application with database, security, and CI/CD.
+Production-ready FastAPI application with unified backend configuration.
+Supports both SQLAlchemy (PostgreSQL) and Beanie (MongoDB) backends dynamically.
 """
 
+import os
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from app.api.v1.api import api_router
 from app.core.config import settings
 from app.core.security import setup_security_headers
-from app.db.database import engine
-from app.db.base import Base
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+
+# Unified backend detection using environment variable
+BACKEND_TYPE = os.getenv("BACKEND_TYPE", "sqlalchemy")
+
+# Import unified database configuration
+from app.db.database import (
+    BACKEND_TYPE,
+    None,
+    "beanie",
+    "sqlalchemy",
+    ==,
+    else,
+    engine,
+    if,
+    init_database,
+)
+
+# Import FastAPI-Users configuration based on backend
+if BACKEND_TYPE == "sqlalchemy":
+    from app.auth.manager import auth_backend, current_active_user, fastapi_users
+    from app.auth.models import User
+    from app.db.base import Base
+else:
+    from app.auth.manager_beanie import auth_backend, current_active_user, fastapi_users
+    from app.auth.models_beanie import User
 
 
 @asynccontextmanager
@@ -23,17 +47,25 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     Manage application lifespan events.
     
     This function handles startup and shutdown events for the FastAPI app,
-    including database initialization.
+    including database initialization based on the selected backend.
     """
     # Startup
     print("🚀 Starting up...")
     print(f"📋 Environment: {settings.ENVIRONMENT}")
     print(f"🔧 Debug mode: {settings.DEBUG}")
+    print(f"🗄️ Backend: {BACKEND_TYPE}")
     
-    # Create database tables
-    if settings.ENVIRONMENT == "development":
-        print("🗄️ Creating database tables...")
-        Base.metadata.create_all(bind=engine)
+    if BACKEND_TYPE == "sqlalchemy":
+        # Create database tables for SQLAlchemy
+        if settings.ENVIRONMENT == "development":
+            print("🗄️ Creating database tables...")
+            Base.metadata.create_all(bind=engine)
+    elif BACKEND_TYPE == "beanie":
+        # Initialize MongoDB for Beanie
+        print("🗄️ Initializing MongoDB connection...")
+        await init_database()
+    else:
+        raise ValueError(f"Unsupported backend type: {BACKEND_TYPE}")
     
     yield
     
@@ -73,6 +105,37 @@ setup_security_headers(app)
 
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+# Include FastAPI-Users routers
+app.include_router(
+    fastapi_users.get_auth_router(auth_backend),
+    prefix="/auth/jwt",
+    tags=["auth"],
+)
+
+app.include_router(
+    fastapi_users.get_register_router(),
+    prefix="/auth",
+    tags=["auth"],
+)
+
+app.include_router(
+    fastapi_users.get_reset_password_router(),
+    prefix="/auth",
+    tags=["auth"],
+)
+
+app.include_router(
+    fastapi_users.get_verify_router(),
+    prefix="/auth",
+    tags=["auth"],
+)
+
+app.include_router(
+    fastapi_users.get_users_router(),
+    prefix="/users",
+    tags=["users"],
+)
 
 
 @app.get("/")

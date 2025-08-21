@@ -6,17 +6,16 @@ import asyncio
 from typing import AsyncGenerator, Generator
 
 import pytest
-from fastapi import FastAPI
-from httpx import AsyncClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-
 from app.api.deps import get_current_user
 from app.core.config import settings
 from app.db.base import Base
 from app.db.database import get_db
 from app.main import app
+from fastapi import FastAPI
+from httpx import AsyncClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 # Create test database
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
@@ -51,9 +50,9 @@ def session(db: None) -> Generator:
     connection = engine.connect()
     transaction = connection.begin()
     session = TestingSessionLocal(bind=connection)
-    
+
     yield session
-    
+
     session.close()
     transaction.rollback()
     connection.close()
@@ -62,6 +61,7 @@ def session(db: None) -> Generator:
 @pytest.fixture(scope="function")
 def client(session: TestingSessionLocal) -> Generator:
     """Create a test client."""
+
     def override_get_db():
         try:
             yield session
@@ -69,7 +69,7 @@ def client(session: TestingSessionLocal) -> Generator:
             pass
 
     app.dependency_overrides[get_db] = override_get_db
-    
+
     with TestClient(app) as test_client:
         yield test_client
 
@@ -77,6 +77,7 @@ def client(session: TestingSessionLocal) -> Generator:
 @pytest.fixture(scope="function")
 async def async_client(session: TestingSessionLocal) -> AsyncGenerator:
     """Create an async test client."""
+
     def override_get_db():
         try:
             yield session
@@ -88,7 +89,7 @@ async def async_client(session: TestingSessionLocal) -> AsyncGenerator:
 
     app.dependency_overrides[get_db] = override_get_db
     app.dependency_overrides[get_current_user] = override_get_current_user
-    
+
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
 

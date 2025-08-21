@@ -5,9 +5,8 @@ Example items router demonstrating modular endpoints.
 from typing import List, Optional
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, HTTPException, Query
-
 from app.models.items import Item, ItemCreate, ItemUpdate
+from fastapi import APIRouter, HTTPException, Query
 
 router = APIRouter()
 
@@ -19,10 +18,10 @@ items_db: dict[str, Item] = {}
 async def create_item(item: ItemCreate) -> Item:
     """
     Create a new item.
-    
+
     Args:
         item: Item creation data
-        
+
     Returns:
         The created item
     """
@@ -45,20 +44,20 @@ async def list_items(
 ) -> List[Item]:
     """
     List items with optional filtering and pagination.
-    
+
     Args:
         skip: Number of items to skip
         limit: Maximum number of items to return
         is_available: Filter by availability
-        
+
     Returns:
         List of items
     """
     items = list(items_db.values())
-    
+
     if is_available is not None:
         items = [item for item in items if item.is_available == is_available]
-    
+
     return items[skip : skip + limit]
 
 
@@ -66,13 +65,13 @@ async def list_items(
 async def get_item(item_id: UUID) -> Item:
     """
     Get a specific item by ID.
-    
+
     Args:
         item_id: UUID of the item
-        
+
     Returns:
         The requested item
-        
+
     Raises:
         HTTPException: If item not found
     """
@@ -86,25 +85,25 @@ async def get_item(item_id: UUID) -> Item:
 async def update_item(item_id: UUID, item_update: ItemUpdate) -> Item:
     """
     Update an existing item.
-    
+
     Args:
         item_id: UUID of the item
         item_update: Update data
-        
+
     Returns:
         The updated item
-        
+
     Raises:
         HTTPException: If item not found
     """
     item = items_db.get(str(item_id))
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    
+
     update_data = item_update.dict(exclude_unset=True)
     for field, value in update_data.items():
         setattr(item, field, value)
-    
+
     items_db[str(item_id)] = item
     return item
 
@@ -113,18 +112,18 @@ async def update_item(item_id: UUID, item_update: ItemUpdate) -> Item:
 async def delete_item(item_id: UUID) -> dict[str, str]:
     """
     Delete an item.
-    
+
     Args:
         item_id: UUID of the item
-        
+
     Returns:
         Success message
-        
+
     Raises:
         HTTPException: If item not found
     """
     if str(item_id) not in items_db:
         raise HTTPException(status_code=404, detail="Item not found")
-    
+
     del items_db[str(item_id)]
     return {"message": "Item deleted successfully"}

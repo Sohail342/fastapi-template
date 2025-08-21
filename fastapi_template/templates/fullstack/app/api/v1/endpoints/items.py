@@ -4,13 +4,12 @@ Item management endpoints.
 
 from typing import Any, List
 
-from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
-
 from app import crud, schemas
 from app.api.deps import get_current_active_user
 from app.db.database import get_db
 from app.models.user import User
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
@@ -24,13 +23,13 @@ def read_items(
 ) -> Any:
     """
     Retrieve items for the current user.
-    
+
     Args:
         db: Database session
         skip: Number of items to skip
         limit: Maximum number of items to return
         current_user: Current authenticated user
-        
+
     Returns:
         List of items
     """
@@ -52,18 +51,16 @@ def create_item(
 ) -> Any:
     """
     Create new item.
-    
+
     Args:
         db: Database session
         item_in: Item creation data
         current_user: Current authenticated user
-        
+
     Returns:
         Created item
     """
-    item = crud.item.create_with_owner(
-        db, obj_in=item_in, owner_id=current_user.id
-    )
+    item = crud.item.create_with_owner(db, obj_in=item_in, owner_id=current_user.id)
     return item
 
 
@@ -77,13 +74,13 @@ def update_item(
 ) -> Any:
     """
     Update an item.
-    
+
     Args:
         db: Database session
         id: Item ID
         item_in: Item update data
         current_user: Current authenticated user
-        
+
     Returns:
         Updated item
     """
@@ -105,12 +102,12 @@ def read_item(
 ) -> Any:
     """
     Get item by ID.
-    
+
     Args:
         db: Database session
         id: Item ID
         current_user: Current authenticated user
-        
+
     Returns:
         Item
     """
@@ -131,12 +128,12 @@ def delete_item(
 ) -> Any:
     """
     Delete an item.
-    
+
     Args:
         db: Database session
         id: Item ID
         current_user: Current authenticated user
-        
+
     Returns:
         Deleted item
     """
