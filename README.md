@@ -1,310 +1,186 @@
-<div align="center">
-  <img src="docs/logo.svg" alt="FastAPI Template CLI" width="600"/>
-  
-  <br/>
-  
-  [![PyPI version](https://badge.fury.io/py/fastapi-template-cli.svg)](https://badge.fury.io/py/fastapi-template-cli)
-  [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-  [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-teal.svg)](https://fastapi.tiangolo.com/)
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-  
-  <br/>
-  
-  **🚀 Production-ready FastAPI scaffolding with SQLAlchemy & MongoDB support**
-  
-  <br/>
-  
-  [📖 Documentation](#-quick-start) • [🔧 Installation](#-installation) • [🎯 Templates](#-templates) • [🗄️ Backends](#-backend-options) • [🤝 Contributing](#-contributing)
-  
-</div>
+# FastAPI Template
 
----
+A powerful CLI tool for generating production-ready FastAPI projects with best practices, integrated authentication, and flexible ORM options.
 
-## ✨ Features
+## Features
 
-<div align="center">
+- 🚀 **Production Ready**: Pre-configured with security, logging, and deployment best practices
+- 🔐 **Integrated Authentication**: FastAPI-Users integration with JWT authentication
+- 🗄️ **Flexible ORM**: Choose between SQLAlchemy (PostgreSQL) or Beanie (MongoDB)
+- 🐳 **Docker Support**: Complete Docker setup with docker-compose
+- 📦 **Celery Integration**: Background task processing (fullstack projects)
+- 🧪 **Testing Ready**: Pre-configured testing setup
+- 📊 **API Documentation**: Auto-generated OpenAPI/Swagger documentation
+- 🎯 **CLI Driven**: Simple command-line interface for project generation
 
-| 🏗️ **Templates** | 🗄️ **Databases** | 🛡️ **Security** | 🐳 **DevOps** |
-|:----------------:|:----------------:|:----------------:|:-------------:|
-| **3 Templates** | **2 Backends** | **JWT Auth** | **Docker** |
-| Minimal → Full-stack | SQLAlchemy + MongoDB | FastAPI Users | CI/CD Ready |
+## Quick Start
 
-</div>
-
-<br/>
-
-### 🎯 **Template Options**
-
-| Template | Purpose | Features | Best For |
-|----------|---------|----------|----------|
-| **🟢 Minimal** | Learning & Prototyping | Single file, basic setup | Beginners, quick demos |
-| **🟡 API Only** | REST APIs & Microservices | Modular structure, testing | APIs, microservices |
-| **🔵 Full-Stack** | Production Applications | Docker, migrations, auth | Production deployments |
-
-### 🗄️ **Backend Support**
-
-<div align="center">
-
-| **SQLAlchemy** | **Beanie (MongoDB)** |
-|:--------------:|:--------------------:|
-| PostgreSQL 🐘 | MongoDB 🍃 |
-| MySQL 🐬 | Async/await ⚡ |
-| SQLite 📱 | JSON Schema ✅ |
-| Alembic 🔄 | Aggregation 📊 |
-
-</div>
-
----
-
-## 🚀 Quick Start
-
-### 📦 Installation
+### Installation
 
 ```bash
-# From PyPI (recommended)
-pip install fastapi-template-cli
-
-# From source
-git clone https://github.com/Sohail342/fastapi-template.git
-cd cli-tool && pip install -e .
+pip install fastapi-template
 ```
 
-### ⚡ Create Your First Project
+### Create a New Project
 
 ```bash
-# Create a production-ready API
-fastapi-template new ecommerce-api --template fullstack --backend sqlalchemy
+# Create an API-only project with SQLAlchemy
+fastapi-template new my-api --orm sqlalchemy --type api
 
-# MongoDB-powered analytics API
-fastapi-template new analytics-api --template api_only --backend beanie
+# Create a fullstack project with MongoDB
+fastapi-template new my-app --orm beanie --type fullstack
 
-# Simple microservice
-fastapi-template new user-service --template api_only --backend sqlalchemy
+# Create with custom description
+fastapi-template new my-project --orm sqlalchemy --type fullstack \
+  --description "My awesome FastAPI project" --author "Your Name"
 ```
 
-### 🛠️ Development Setup
+## Project Types
+
+### API-Only Projects
+- Lightweight FastAPI backend
+- Database integration (SQLAlchemy or Beanie)
+- FastAPI-Users authentication
+- No frontend or background tasks
+
+### Fullstack Projects
+- Complete backend with FastAPI
+- Database integration
+- FastAPI-Users authentication
+- Celery for background tasks
+- Redis for caching and task queue
+- Docker setup with docker-compose
+
+## ORM Options
+
+### SQLAlchemy (PostgreSQL)
+- **Database**: PostgreSQL
+- **ORM**: SQLAlchemy 2.0 with async support
+- **Migrations**: Alembic
+- **Connection**: asyncpg driver
+
+### Beanie (MongoDB)
+- **Database**: MongoDB
+- **ODM**: Beanie (async MongoDB ODM)
+- **Driver**: Motor
+- **Schema**: Pydantic-based documents
+
+## Usage
+
+### Basic Commands
 
 ```bash
-cd your-project-name
-pip install -r requirements.txt
+# List available templates
+fastapi-template list-templates
 
-# SQLAlchemy: Run migrations
-alembic upgrade head
+# Create a new project
+fastapi-template new myproject
 
-# Start development server
-uvicorn app.main:app --reload
+# Show version
+fastapi-template version
 ```
 
----
+### Project Structure
 
-## 📋 CLI Reference
+Generated projects follow a clean architecture:
 
-### 🔧 Command Structure
-
-```bash
-fastapi-template new PROJECT_NAME [OPTIONS]
 ```
-
-### ⚙️ Options
-
-| Option | Values | Default | Description |
-|--------|--------|---------|-------------|
-| `--template` | `minimal`, `api_only`, `fullstack` | `minimal` | Project template type |
-| `--backend` | `sqlalchemy`, `beanie` | `sqlalchemy` | Database backend |
-| `--auth` | flag | - | Include authentication setup |
-
-### 🎯 Usage Examples
-
-```bash
-# Full-stack with PostgreSQL
-fastapi-template new ecommerce-api --template fullstack --backend sqlalchemy
-
-# API-only with MongoDB
-fastapi-template new analytics-api --template api_only --backend beanie
-
-# Minimal with SQLite
-fastapi-template new simple-api --template minimal --backend sqlalchemy
-
-# With authentication
-fastapi-template new social-app --template fullstack --backend beanie --auth
-```
-
----
-
-## 🗄️ Backend Configuration
-
-### 🐘 **SQLAlchemy Backend**
-
-**✅ Features:**
-- PostgreSQL, MySQL, SQLite support
-- SQLAlchemy 2.0+ ORM
-- Alembic migrations
-- Connection pooling
-- Transaction support
-
-**📦 Dependencies:**
-```
-sqlalchemy>=2.0.0
-alembic>=1.12.0
-psycopg2-binary>=2.9.0  # PostgreSQL
-# or
-pymysql>=1.1.0         # MySQL
-```
-
-**⚙️ Environment:**
-```bash
-DATABASE_URL=postgresql://user:password@localhost/dbname
-# or
-DATABASE_URL=sqlite:///./app.db
-```
-
-### 🍃 **Beanie Backend (MongoDB)**
-
-**✅ Features:**
-- MongoDB with async/await
-- Beanie ODM
-- JSON Schema validation
-- Automatic indexing
-- Aggregation pipelines
-
-**📦 Dependencies:**
-```
-beanie>=1.23.0
-motor>=3.3.0
-pymongo>=4.6.0
-```
-
-**⚙️ Environment:**
-```bash
-DATABASE_URL=mongodb://localhost:27017/your_db_name
-```
-
----
-
-## 🏗️ Project Structure
-
-### SQLAlchemy Backend
-```
-📁 ecommerce-api/
-├── 📄 app/
-│   ├── 📁 api/
-│   │   └── api_v1/
+myproject/
+├── app/
+│   ├── api/
+│   │   └── v1/
+│   │       ├── api.py
 │   │       └── endpoints/
-│   │           ├── users.py
-│   │           └── items.py
-│   ├── 📁 crud/
-│   │   ├── user.py
-│   │   └── item.py
-│   ├── 📁 db/
-│   │   ├── database.py
-│   │   └── base.py
-│   ├── 📁 models/
-│   │   ├── user.py
-│   │   └── item.py
-│   ├── 📁 schemas/
-│   │   ├── user.py
-│   │   └── item.py
-│   └── 📄 main.py
-├── 📁 tests/
-├── 📄 requirements.txt
-├── 📄 Dockerfile
-├── 📄 docker-compose.yml
-└── 📄 .env.example
+│   │           └── users.py
+│   ├── core/
+│   │   ├── config.py
+│   │   └── security.py
+│   ├── db/
+│   │   ├── session.py (SQLAlchemy) or mongo.py (Beanie)
+│   │   └── base_class.py (SQLAlchemy)
+│   ├── models/
+│   │   └── user.py
+│   ├── schemas/
+│   │   └── user.py
+│   ├── users.py (FastAPI-Users config)
+│   └── main.py
+├── docker/
+│   ├── Dockerfile
+│   └── docker-compose.yml (fullstack only)
+├── alembic/ (SQLAlchemy only)
+├── workers/ (fullstack only)
+├── pyproject.toml
+├── .env
+└── .gitignore
 ```
 
-### Beanie Backend
-```
-📁 analytics-api/
-├── 📄 app/
-│   ├── 📁 api/
-│   ├── 📁 crud/
-│   ├── 📁 db/
-│   ├── 📁 models/
-│   ├── 📁 schemas/
-│   └── 📄 main.py
-├── 📁 tests/
-└── 📄 requirements.txt
-```
+## Development
 
----
+### SQLAlchemy Projects
 
-## 🧪 Testing
+1. **Setup Database**
+   ```bash
+   cd myproject
+   pip install -e .
+   alembic upgrade head
+   ```
 
-```bash
-# Run all tests
-pytest
+2. **Run Development Server**
+   ```bash
+   uvicorn app.main:app --reload
+   ```
 
-# With coverage
-pytest --cov=app tests/
+3. **Create Database Migration**
+   ```bash
+   alembic revision --autogenerate -m "Add new table"
+   ```
 
-# Run specific test
-pytest tests/test_users.py -v
-```
+### Beanie Projects
 
----
+1. **Setup MongoDB**
+   ```bash
+   cd myproject
+   pip install -e .
+   # MongoDB will auto-initialize on first connection
+   ```
 
-## 🐳 Docker Support
+2. **Run Development Server**
+   ```bash
+   uvicorn app.main:app --reload
+   ```
 
-### Quick Start with Docker
+### Fullstack Projects (Docker)
 
-```bash
-# Build and run with Docker
-docker-compose up --build
+1. **Start All Services**
+   ```bash
+   cd myproject
+   docker-compose up -d
+   ```
 
-# Or run standalone
-docker build -t my-api .
-docker run -p 8000:8000 my-api
-```
+2. **Access Services**
+   - API: http://localhost:8000
+   - API Docs: http://localhost:8000/docs
+   - MongoDB: localhost:27017 (Beanie)
+   - PostgreSQL: localhost:5432 (SQLAlchemy)
+   - Redis: localhost:6379
 
-### Docker Compose Services
+## Configuration
 
-| Service | Port | Description |
-|---------|------|-------------|
-| **app** | 8000 | FastAPI application |
-| **db** | 5432 | PostgreSQL database |
-| **redis** | 6379 | Redis cache |
+### Environment Variables
 
----
-
-## 🛠️ Development
-
-### 🔧 Setup Development Environment
-
-```bash
-git clone https://github.com/Sohail342/fastapi-template.git
-cd cli-tool
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install development dependencies
-pip install -e ".[dev]"
-
-# Run tests
-pytest
-
-# Format code
-ruff format .
-ruff check .
-```
-
-### 📝 Environment Variables
-
-Create `.env` file:
+Create a `.env` file in your project root:
 
 ```bash
 # Database
-DATABASE_URL=postgresql://user:password@localhost/dbname
+DATABASE_URL=postgresql+asyncpg://user:pass@localhost/dbname  # SQLAlchemy
+MONGODB_URL=mongodb://localhost:27017/myproject  # Beanie
 
-# Security (auto-generated if empty)
+# Security
 SECRET_KEY=your-secret-key-here
-ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-# Redis (optional)
-REDIS_URL=redis://localhost:6379
+# Redis (fullstack)
+REDIS_URL=redis://localhost:6379/0
 
 # Email (optional)
 SMTP_HOST=smtp.gmail.com
@@ -313,140 +189,132 @@ SMTP_USER=your-email@gmail.com
 SMTP_PASSWORD=your-password
 ```
 
----
+### Database Configuration
 
-## 🚨 Troubleshooting
-
-### 🔍 Common Issues
-
-#### Database Connection
+#### SQLAlchemy (PostgreSQL)
 ```bash
-# PostgreSQL
-sudo service postgresql start
-psql -c "CREATE DATABASE myapp;"
+# Install PostgreSQL
+# Create database
+createdb myproject
 
-# MongoDB
-sudo service mongod start
-mongosh --eval "use myapp;"
+# Set DATABASE_URL
+export DATABASE_URL=postgresql+asyncpg://user:password@localhost/myproject
 ```
 
-#### Migration Issues
+#### Beanie (MongoDB)
 ```bash
-# Reset migrations (SQLAlchemy)
-alembic downgrade base
-alembic revision --autogenerate -m "Initial migration"
-alembic upgrade head
+# Install MongoDB
+# MongoDB will create database on first connection
+export MONGODB_URL=mongodb://localhost:27017/myproject
 ```
 
-#### Import Errors
-```bash
-# Ensure all dependencies
-pip install -r requirements.txt
+## API Endpoints
 
-# Check Python version
-python --version  # Should be 3.8+
+Generated projects include these endpoints:
+
+### Authentication
+- `POST /auth/jwt/login` - User login
+- `POST /auth/jwt/logout` - User logout
+- `POST /auth/register` - User registration
+- `POST /auth/forgot-password` - Request password reset
+- `POST /auth/reset-password` - Reset password
+
+### Users
+- `GET /users/me` - Get current user
+- `PATCH /users/me` - Update current user
+- `GET /users/{id}` - Get user by ID
+- `GET /users` - List users (admin only)
+
+### Health Check
+- `GET /health` - API health status
+- `GET /` - Welcome message
+
+## Testing
+
+Generated projects include testing setup:
+
+```bash
+# Run tests
+pytest
+
+# Run with coverage
+pytest --cov=app tests/
+
+# Run specific test file
+pytest tests/test_users.py
 ```
 
-### 📞 Getting Help
+## Deployment
 
-- **🐛 Issues**: [GitHub Issues](https://github.com/Sohail342/fastapi-template/issues)
-- **📖 Docs**: [Generated README.md](README.md) in your project
-- **💬 Discussions**: [GitHub Discussions](https://github.com/Sohail342/fastapi-template/discussions)
+### Docker Deployment
 
----
+For fullstack projects:
 
-## 🤝 Contributing
+```bash
+# Build and run
+docker-compose up -d --build
 
-We welcome contributions! Here's how to get started:
+# View logs
+docker-compose logs -f
 
-### 🔄 Contribution Workflow
+# Stop services
+docker-compose down
+```
 
-1. **Fork & Clone**
+### Production Deployment
+
+1. **Environment Variables**
    ```bash
-   git clone https://github.com/Sohail342/fastapi-template.git
-   cd cli-tool
+   export SECRET_KEY=your-production-secret
+   export DATABASE_URL=your-production-db-url
    ```
 
-2. **Setup Environment**
+2. **Gunicorn/Uvicorn**
    ```bash
-   python -m venv venv
-   source venv/bin/activate
-   pip install -e ".[dev]"
+   gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
    ```
 
-3. **Create Feature Branch**
-   ```bash
-   git checkout -b feature/amazing-feature
+3. **Nginx Reverse Proxy**
+   ```nginx
+   server {
+       listen 80;
+       server_name your-domain.com;
+       
+       location / {
+           proxy_pass http://localhost:8000;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+       }
+   }
    ```
 
-4. **Make Changes**
-   - Add new templates/backends
-   - Update documentation
-   - Add comprehensive tests
+## Contributing
 
-5. **Test Your Changes**
-   ```bash
-   pytest
-   # Test template generation
-   fastapi-template new test-project --template fullstack --backend sqlalchemy
-   ```
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Make your changes
+4. Add tests for new functionality
+5. Run tests: `pytest`
+6. Commit your changes: `git commit -am 'Add feature'`
+7. Push to the branch: `git push origin feature-name`
+8. Submit a pull request
 
-6. **Submit PR**
-   ```bash
-   git commit -m "Add amazing feature"
-   git push origin feature/amazing-feature
-   ```
+## License
 
-### 🎯 Contribution Ideas
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-- **🆕 New Backends**: Django ORM, Tortoise ORM, Prisma
-- **🧩 New Templates**: GraphQL API, Microservices, Serverless
-- **🎨 UI Templates**: React frontend, Vue.js integration
-- **🔧 Tools**: Database seeders, API documentation generators
+## Support
 
-### 📋 Guidelines
+- 📖 [Documentation](https://github.com/your-org/fastapi-template/wiki)
+- 🐛 [Issue Tracker](https://github.com/your-org/fastapi-template/issues)
+- 💬 [Discussions](https://github.com/your-org/fastapi-template/discussions)
 
-- ✅ Follow PEP 8 style guidelines
-- ✅ Add tests for new features
-- ✅ Update documentation
-- ✅ Ensure all tests pass
-- ✅ Use meaningful commit messages
+## Changelog
 
----
-
-## 📊 Stats & Badges
-
-<div align="center">
-
-![PyPI - Downloads](https://img.shields.io/pypi/dm/fastapi-template-cli?style=flat-square)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/fastapi-template-cli?style=flat-square)
-![GitHub stars](https://img.shields.io/github/stars/Sohail342/fastapi-template?style=flat-square)
-![GitHub forks](https://img.shields.io/github/forks/Sohail342/fastapi-template?style=flat-square)
-
-</div>
-
----
-
-## 🏆 Showcase
-
-### Built with FastAPI Template CLI
-
-<div align="center">
-
-| **Project** | **Template** | **Backend** | **Description** |
-|-------------|--------------|-------------|-----------------|
-| **E-commerce API** | Full-stack | SQLAlchemy | Production e-commerce backend |
-| **Analytics Service** | API Only | Beanie | Real-time data analytics |
-| **User Management** | API Only | SQLAlchemy | Microservice architecture |
-
-</div>
-
----
-
-<div align="center">
-
-**Made with ❤️ by the FastAPI community**
-
-⭐ **Star us on GitHub** to support development!
-
-</div>
+### v1.0.0
+- Initial release
+- SQLAlchemy and Beanie support
+- API-only and fullstack project types
+- FastAPI-Users integration
+- Docker support
+- CLI tool

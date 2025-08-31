@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/{{ project_slug }}
+      - SYNC_DATABASE_URL=postgresql://postgres:postgres@db:5432/{{ project_slug }}
+      - REDIS_URL=redis://redis:6379
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ../app:/app/app
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB={{ project_slug }}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  celery:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: celery -A app.workers.celery_app worker --loglevel=info
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/{{ project_slug }}
+      - SYNC_DATABASE_URL=postgresql://postgres:postgres@db:5432/{{ project_slug }}
+      - REDIS_URL=redis://redis:6379
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ../app:/app/app
+    restart: unless-stopped
+
+  celery-beat:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: celery -A app.workers.celery_app beat --loglevel=info
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/{{ project_slug }}
+      - SYNC_DATABASE_URL=postgresql://postgres:postgres@db:5432/{{ project_slug }}
+      - REDIS_URL=redis://redis:6379
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ../app:/app/app
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

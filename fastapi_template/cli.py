@@ -1,172 +1,168 @@
-"""CLI interface for fastapi-template-cli with pre-processing backend system."""
+"""Enhanced CLI for FastAPI Template with integrated template rendering."""
 
-import shutil
+import typer
 from pathlib import Path
+from typing import Optional
 
-import click
+from fastapi_template.renderer import TemplateRenderer
 
-from .backend_processor import BackendProcessor
-
-
-class TemplateError(Exception):
-    """Exception raised for template-related errors."""
-
-
-def get_template_path(template_name: str) -> Path:
-    """Get the absolute path to a template directory."""
-    package_dir = Path(__file__).parent
-    template_path = package_dir / "templates" / template_name
-
-    if not template_path.exists():
-        raise TemplateError(f"Template '{template_name}' not found at {template_path}")
-
-    return template_path
-
-
-def copy_template(template_path: Path, target_path: Path) -> None:
-    """Copy template directory to target location."""
-    try:
-        shutil.copytree(template_path, target_path)
-    except Exception as e:
-        raise TemplateError(f"Failed to copy template: {e}")
-
-
-def print_next_steps(
-    project_name: str, template_type: str, backend: str = None
-) -> None:
-    """Print instructions for getting started with the new project."""
-    click.echo("\n🎉 Project created successfully!")
-    click.echo(f"\n📁 Your new FastAPI project is ready: {project_name}")
-
-    if template_type in ["api_only", "fullstack"]:
-        click.echo("\n📋 Next steps:")
-        click.echo(f"  cd {project_name}")
-        click.echo("  pip install -r requirements.txt")
-
-        if template_type == "fullstack" and backend:
-            click.echo(f"\n🔧 FastAPI-Users configured with {backend.upper()} backend")
-            click.echo(
-                "\n📖 Check the AUTHENTICATION.md file for detailed setup instructions"
-            )
-
-        click.echo("  uvicorn app.main:app --reload")
-    else:
-        click.echo("\n📋 Next steps:")
-        click.echo(f"  cd {project_name}")
-        click.echo("  pip install fastapi uvicorn[standard]")
-        click.echo("  uvicorn main:app --reload")
-
-
-@click.group()
-def cli() -> None:
-    """FastAPI Template CLI - Scaffold modern FastAPI projects."""
-
-
-@cli.command()
-@click.argument("project_name")
-@click.option(
-    "--template",
-    "-t",
-    type=click.Choice(["minimal", "api_only", "fullstack"]),
-    help="Project template type (bypasses interactive selection)",
+app = typer.Typer(
+    name="fastapi-template",
+    help="Generate FastAPI projects with best practices",
+    add_completion=False,
 )
-@click.option(
-    "--backend",
-    "-b",
-    type=click.Choice(["sqlalchemy", "beanie"]),
-    help="Database backend (for fullstack template)",
-)
-def new(project_name: str, template: str = None, backend: str = None) -> None:
-    """Create a new FastAPI project with pre-processed static templates."""
-    target_path = Path.cwd() / project_name
 
-    if target_path.exists():
-        click.echo(f"❌ Directory '{project_name}' already exists.", err=True)
-        raise click.Abort()
 
-    # Collect user configuration
-    user_config = collect_user_config(template, backend)
+def validate_project_name(name: str) -> str:
+    """Validate project name format."""
+    import re
+
+    if not re.match(r"^[a-zA-Z][a-zA-Z0-9_-]*$", name):
+        raise typer.BadParameter(
+            "Project name must start with a letter and contain only letters, numbers, hyphens, and underscores"
+        )
+    return name
+
+
+@app.command()
+def new(
+    name: str = typer.Argument(
+        ..., help="Name of the new project", callback=validate_project_name
+    ),
+    orm: str = typer.Option(
+        "sqlalchemy", help="Choose ORM: sqlalchemy | beanie", case_sensitive=False
+    ),
+    project_type: str = typer.Option(
+        "api",
+        "--type",
+        "--project-type",
+        help="Choose type: api | fullstack",
+        case_sensitive=False,
+    ),
+    description: Optional[str] = typer.Option(None, help="Project description"),
+    author: Optional[str] = typer.Option(None, help="Project author"),
+    force: bool = typer.Option(
+        False, "--force", "-f", help="Overwrite existing directory"
+    ),
+):
+    """Create a new FastAPI project with best practices."""
+
+    # Normalize inputs
+    orm = orm.lower()
+    project_type = project_type.lower()
+
+    # Validate inputs
+    if orm not in ["sqlalchemy", "beanie"]:
+        typer.echo(f"❌ Invalid ORM: {orm}. Must be 'sqlalchemy' or 'beanie'.")
+        raise typer.Exit(1)
+
+    if project_type not in ["api", "fullstack"]:
+        typer.echo(
+            f"❌ Invalid project type: {project_type}. Must be 'api' or 'fullstack'."
+        )
+        raise typer.Exit(1)
+
+    # Setup paths
+    project_dir = Path.cwd() / name
+
+    if project_dir.exists() and not force:
+        typer.echo(f"❌ Directory {name} already exists. Use --force to overwrite.")
+        raise typer.Exit(1)
+    elif project_dir.exists() and force:
+        typer.echo(f"⚠️  Overwriting existing directory: {name}")
+        import shutil
+
+        shutil.rmtree(project_dir)
+
+    # Initialize renderer
+    template_dir = Path(__file__).parent.parent / "templates"
+    renderer = TemplateRenderer(template_dir)
+
+    # Additional context
+    additional_context = {
+        "description": description or f"A FastAPI {project_type} project using {orm}",
+        "author": author or "FastAPI Template",
+        "year": 2024,
+    }
+
+    typer.echo(f"🚀 Creating FastAPI {project_type} project: {name}")
+    typer.echo(f"   ORM: {orm}")
+    typer.echo(f"   Type: {project_type}")
+    typer.echo()
 
     try:
-        template_path = get_template_path(user_config["template_type"])
-
-        click.echo(
-            f"📦 Creating {user_config['template_type']} project: {project_name}"
+        # Render the complete project
+        renderer.render_project(
+            project_name=name,
+            project_type=project_type,
+            orm_type=orm,
+            target_dir=project_dir,
+            additional_context=additional_context,
         )
 
-        # Copy template to target location
-        copy_template(template_path, target_path)
+        typer.echo(f"✅ Project created successfully: {name}")
+        typer.echo()
+        typer.echo("Next steps:")
+        typer.echo(f"  cd {name}")
+        typer.echo("  pip install -e .")
 
-        # Process template with backend processor
-        click.echo("🔧 Processing template configuration...")
-        processor = BackendProcessor(template_path, target_path)
-        processor.process_template(user_config)
+        if orm == "sqlalchemy":
+            typer.echo("  # Initialize database:")
+            typer.echo("  alembic upgrade head")
+        elif orm == "beanie":
+            typer.echo("  # MongoDB will initialize on first connection")
 
-        # Clean up template configuration file
-        config_file = target_path / ".template_config.json"
-        if config_file.exists():
-            config_file.unlink()
-
-        print_next_steps(
-            project_name, user_config["template_type"], user_config.get("backend")
-        )
-
-    except TemplateError as e:
-        click.echo(f"❌ Error: {e}", err=True)
-        raise click.Abort()
-    except Exception as e:
-        click.echo(f"❌ Unexpected error: {e}", err=True)
-        raise click.Abort()
-
-
-def collect_user_config(template: str = None, backend: str = None) -> dict:
-    """Collect all user configuration choices upfront."""
-    config = {}
-
-    # Interactive template selection if not provided
-    if template is None:
-        click.echo("🚀 Welcome to FastAPI Template CLI!")
-        click.echo("\nPlease select a project type:")
-        click.echo("  1) Minimal - Basic FastAPI app with Hello World")
-        click.echo("  2) API Only - Modular structure for medium projects")
-        click.echo("  3) Full-stack - Production-ready with database & auth")
-
-        choice = click.prompt(
-            "Enter your choice (1-3)", type=click.IntRange(1, 3), default=2
-        )
-
-        template_map = {1: "minimal", 2: "api_only", 3: "fullstack"}
-        config["template_type"] = template_map[choice]
-    else:
-        config["template_type"] = template
-
-    # Backend selection for fullstack template
-    if config["template_type"] == "fullstack":
-        if backend is None:
-            click.echo("\n🗄️  Select your database backend:")
-            click.echo("  1) SQLAlchemy - PostgreSQL/SQLite with SQLAlchemy ORM")
-            click.echo("  2) Beanie - MongoDB with Beanie ODM")
-
-            backend_choice = click.prompt(
-                "Enter your choice (1-2)", type=click.IntRange(1, 2), default=1
-            )
-
-            backend_map = {1: "sqlalchemy", 2: "beanie"}
-            config["backend"] = backend_map[backend_choice]
+        if project_type == "fullstack":
+            typer.echo("  # Start with Docker (includes database):")
+            typer.echo("  docker-compose up -d")
         else:
-            config["backend"] = backend
+            typer.echo("  # Start development server:")
+            typer.echo("  uvicorn app.main:app --reload")
 
-    return config
+    except Exception as e:
+        typer.echo(f"❌ Error creating project: {e}")
+        raise typer.Exit(1)
 
 
-@cli.command()
-def templates() -> None:
-    """List available project templates."""
-    click.echo("📋 Available templates:")
-    click.echo("  • minimal - Basic FastAPI app")
-    click.echo("  • api_only - Modular structure with routers and models")
-    click.echo("  • fullstack - Production-ready with database, auth, and Docker")
+@app.command()
+def list_templates():
+    """List available templates and configurations."""
+    typer.echo("Available templates:")
+    typer.echo()
+
+    template_dir = Path(__file__).parent.parent / "templates"
+
+    # List ORM types
+    typer.echo("ORM options:")
+    for orm_dir in template_dir.iterdir():
+        if orm_dir.is_dir() and orm_dir.name in ["sqlalchemy", "beanie"]:
+            typer.echo(f"  • {orm_dir.name}")
+
+            # List project types
+            typer.echo("    Project types:")
+            for project_type_dir in orm_dir.iterdir():
+                if project_type_dir.is_dir():
+                    typer.echo(f"      • {project_type_dir.name}")
+
+    typer.echo()
+    typer.echo("Common templates (always included):")
+    common_dir = template_dir / "common"
+    if common_dir.exists():
+        for item in common_dir.rglob("*.j2"):
+            typer.echo(f"  • {item.relative_to(common_dir)}")
+
+
+@app.command()
+def version():
+    """Show version information."""
+    typer.echo("FastAPI Template CLI v1.0.0")
+
+
+@app.callback()
+def main():
+    """FastAPI Template CLI - Generate FastAPI projects with best practices."""
+    pass
 
 
 if __name__ == "__main__":
-    cli()
+    app()

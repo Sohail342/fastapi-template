@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fastapi-template-cli"
-version = "1.2.3"
+name = "fastapi-template"
+version = "1.2.4"
 description = "A powerful CLI tool for generating production-ready FastAPI applications with SQLAlchemy and MongoDB support"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -43,13 +43,13 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/sohail432/fastapi-template-cli"
-Documentation = "https://github.com/sohail432/fastapi-template-cli#readme"
-Repository = "https://github.com/sohail432/fastapi-template-cli"
-Issues = "https://github.com/sohail432/fastapi-template-cli/issues"
+Homepage = "https://github.com/Sohail342/fastapi-template"
+Documentation = "https://github.com/Sohail342/fastapi-template#readme"
+Repository = "https://github.com/Sohail342/fastapi-template"
+Issues = "https://github.com/Sohail342/fastapi-template/issues"
 
 [project.scripts]
-fastapi-template = "fastapi_template.cli:cli"
+fastapi-template = "fastapi_template.cli:app"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -75,3 +75,6 @@ exclude = [
 quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
+
+[tool.uv.workspace]
+members = ["test-project"]

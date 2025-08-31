@@ -1,0 +1,33 @@
+"""User model for Beanie (MongoDB)."""
+
+from typing import Optional
+
+from beanie import Document
+from pydantic import EmailStr, Field
+
+
+class User(Document):
+    """User document model."""
+    
+    email: EmailStr
+    hashed_password: str
+    is_active: bool = True
+    is_superuser: bool = False
+    is_verified: bool = False
+    full_name: Optional[str] = None
+    
+    class Settings:
+        name = "users"
+        indexes = [
+            "email",
+        ]
+        
+    class Config:
+        schema_extra = {
+            "example": {
+                "email": "user@example.com",
+                "full_name": "John Doe",
+                "is_active": True,
+                "is_superuser": False,
+            }
+        }

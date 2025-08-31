@@ -1,0 +1,44 @@
+"""MongoDB configuration for Beanie."""
+
+from typing import AsyncGenerator
+
+from beanie import init_beanie
+from motor.motor_asyncio import AsyncIOMotorClient
+
+from app.core.config import settings
+from app.models.user import User
+
+
+class MongoDB:
+    client: AsyncIOMotorClient = None
+    database = None
+
+
+db = MongoDB()
+
+
+async def init_db():
+    """Initialize MongoDB connection and Beanie."""
+    db.client = AsyncIOMotorClient(settings.MONGODB_URL)
+    db.database = db.client[settings.DATABASE_NAME]
+    
+    # Initialize Beanie with document models
+    await init_beanie(
+        database=db.database,
+        document_models=[
+            User,
+        ],
+    )
+
+
+async def close_db():
+    """Close MongoDB connection."""
+    if db.client:
+        db.client.close()
+
+
+async def get_db() -> AsyncGenerator:
+    """Dependency to get database session."""
+    # Beanie doesn't require explicit session management
+    # This is mainly for FastAPI dependency injection
+    yield None

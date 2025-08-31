@@ -1,1 +1,0 @@
-"""API Only FastAPI application."""

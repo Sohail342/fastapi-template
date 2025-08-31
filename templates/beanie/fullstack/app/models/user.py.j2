@@ -1,0 +1,21 @@
+"""User model for Beanie fullstack projects."""
+
+from beanie import Document
+from pydantic import Field, EmailStr
+
+
+class User(Document):
+    """User model for MongoDB."""
+    
+    email: EmailStr = Field(..., unique=True, index=True)
+    hashed_password: str = Field(...)
+    is_active: bool = Field(default=True)
+    is_superuser: bool = Field(default=False)
+    is_verified: bool = Field(default=False)
+    full_name: str | None = Field(default=None)
+
+    class Settings:
+        name = "users"
+        indexes = [
+            "email",
+        ]
