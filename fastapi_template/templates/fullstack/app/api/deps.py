@@ -2,10 +2,7 @@
 API dependencies for authentication and authorization.
 """
 
-from typing import Generator
-
 from app.core import security
-from app.core.config import settings
 from app.crud.user import user as crud_user
 from app.db.database import get_db
 from app.models.user import User

@@ -2,11 +2,9 @@
 Tests for user endpoints.
 """
 
-import pytest
 from app.core.config import settings
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-
 from tests.utils.user import create_test_user
 
 

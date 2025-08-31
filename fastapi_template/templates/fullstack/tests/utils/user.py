@@ -2,11 +2,9 @@
 User test utilities and factories.
 """
 
-from typing import Optional
-
 from app.core.security import get_password_hash
 from app.models.user import User
-from factory import Factory, Faker, LazyAttribute, Sequence, SubFactory
+from factory import Factory, Faker, LazyAttribute, Sequence
 from sqlalchemy.orm import Session
 
 

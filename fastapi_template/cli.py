@@ -1,6 +1,5 @@
 """CLI interface for fastapi-template-cli with pre-processing backend system."""
 
-import os
 import shutil
 from pathlib import Path
 
@@ -11,8 +10,6 @@ from .backend_processor import BackendProcessor
 
 class TemplateError(Exception):
     """Exception raised for template-related errors."""
-
-    pass
 
 
 def get_template_path(template_name: str) -> Path:
@@ -63,7 +60,6 @@ def print_next_steps(
 @click.group()
 def cli() -> None:
     """FastAPI Template CLI - Scaffold modern FastAPI projects."""
-    pass
 
 
 @cli.command()

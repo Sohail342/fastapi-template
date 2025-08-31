@@ -5,7 +5,7 @@ This module dynamically defines the User model based on the selected backend.
 
 import os
 from datetime import datetime
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Optional
 
 # Backend detection
 BACKEND_TYPE = os.getenv("BACKEND_TYPE", "sqlalchemy")
@@ -17,7 +17,7 @@ if BACKEND_TYPE == "sqlalchemy":
     from sqlalchemy.orm import relationship
 
     if TYPE_CHECKING:
-        from app.models.item import Item
+        pass
 
     class User(Base):
         """User model with authentication features (SQLAlchemy)."""
@@ -44,8 +44,7 @@ if BACKEND_TYPE == "sqlalchemy":
 
 elif BACKEND_TYPE == "beanie":
     # Beanie document model definition
-    from app.models.item import Item
-    from beanie import Document, Link
+    from beanie import Document
     from pydantic import EmailStr, Field
 
     class User(Document):

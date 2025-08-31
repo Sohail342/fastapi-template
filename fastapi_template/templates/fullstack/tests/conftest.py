@@ -11,7 +11,6 @@ from app.core.config import settings
 from app.db.base import Base
 from app.db.database import get_db
 from app.main import app
-from fastapi import FastAPI
 from httpx import AsyncClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker

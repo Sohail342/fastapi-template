@@ -3,18 +3,15 @@ Security utilities for authentication and authorization.
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 from app.core.config import settings
-from app.db.database import get_db
-from fastapi import Depends, HTTPException, Security
+from fastapi import HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import jwt
 from passlib.context import CryptContext
-from sqlalchemy.orm import Session
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import Response
 
 # Import user models based on backend type
 try:
@@ -198,7 +195,6 @@ async def get_current_user_from_db(
     if USE_SQLALCHEMY and SQLUser:
         # SQLAlchemy backend
         from app.db.database import async_session_maker
-        from sqlalchemy.ext.asyncio import AsyncSession
 
         async with async_session_maker() as session:
             from sqlalchemy import select
@@ -220,7 +216,7 @@ async def get_current_user_from_db(
             if not user:
                 raise HTTPException(status_code=404, detail="User not found")
             return user
-        except Exception as e:
+        except Exception:
             raise HTTPException(status_code=404, detail="User not found")
 
     else:

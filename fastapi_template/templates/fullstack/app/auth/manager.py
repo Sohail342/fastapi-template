@@ -30,7 +30,6 @@ if settings.BACKEND_TYPE == "sqlalchemy":
 elif settings.BACKEND_TYPE == "beanie":
     from app.auth.models import User as UserModel
     from app.auth.models import get_user_db as get_user_db_raw
-    from fastapi_users.db import BeanieUserDatabase
 
     async def get_user_db():
         """Get user database for Beanie."""

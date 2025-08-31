@@ -5,7 +5,7 @@ Supports both SQLAlchemy (PostgreSQL) and Beanie (MongoDB) backends.
 """
 
 import os
-from typing import Any, AsyncGenerator, Union
+from typing import Any, AsyncGenerator
 
 # Backend detection based on environment variable set during template creation
 BACKEND_TYPE = os.getenv("BACKEND_TYPE", "sqlalchemy")

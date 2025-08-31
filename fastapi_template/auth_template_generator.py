@@ -6,7 +6,6 @@ It uses a modular approach to generate models.py and manager.py files based on t
 """
 
 import textwrap
-from pathlib import Path
 from typing import Any, Dict
 
 

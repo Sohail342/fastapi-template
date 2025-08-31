@@ -2,13 +2,9 @@
 Tests for authentication endpoints.
 """
 
-import pytest
 from app.core.config import settings
-from app.core.security import verify_password
-from app.crud.user import user as crud_user
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
-
 from tests.utils.user import create_test_user
 
 

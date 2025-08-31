@@ -1,12 +1,9 @@
 """Backend processor for dynamic template generation with modular authentication."""
 
 import json
-import os
 import shutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-
-import yaml
+from typing import Any, Dict, List
 
 from .auth_template_generator import AuthTemplateGenerator
 
@@ -192,16 +189,31 @@ class BackendProcessor:
         app_dir = self.target_path / "app"
         db_dir = app_dir / "db"
         models_dir = app_dir / "models"
+        schemas_dir = app_dir / "schemas"
+        crud_dir = app_dir / "crud"
+        api_dir = app_dir / "api"
         auth_dir = app_dir / "auth"
 
         db_dir.mkdir(parents=True, exist_ok=True)
         models_dir.mkdir(parents=True, exist_ok=True)
+        schemas_dir.mkdir(parents=True, exist_ok=True)
+        crud_dir.mkdir(parents=True, exist_ok=True)
+        api_dir.mkdir(parents=True, exist_ok=True)
         auth_dir.mkdir(parents=True, exist_ok=True)
 
         # Generate database.py with static backend configuration
         database_content = self._get_database_content()
         with open(db_dir / "database.py", "w") as f:
             f.write(database_content)
+
+        # Generate schemas
+        self._generate_schemas_content()
+
+        # Generate CRUD operations
+        self._generate_crud_content()
+
+        # Generate API routers
+        self._generate_api_content()
 
         # Generate main.py with static backend configuration
         main_content = self._get_main_content()
@@ -248,7 +260,6 @@ class BackendProcessor:
         """Copy static files that don't need processing."""
         # Copy all files from template, then process conditional ones
         # The copy happens in CLI, so this is handled by shutil.copytree
-        pass
 
     def _generate_static_config(self) -> None:
         """Generate static configuration file."""
@@ -268,7 +279,7 @@ class BackendProcessor:
     # Content generation methods
     def _get_sqlalchemy_alembic_ini(self) -> str:
         """Generate SQLAlchemy-specific alembic.ini content."""
-        return f"""# A generic, single database configuration.
+        return """# A generic, single database configuration.
 
 [alembic]
 # path to migration scripts
@@ -491,6 +502,16 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def create_tables():
+    """Create all database tables."""
+    Base.metadata.create_all(bind=engine)
+
+
+def drop_tables():
+    """Drop all database tables."""
+    Base.metadata.drop_all(bind=engine)
 '''
         else:
             return '''"""Database configuration for Beanie backend."""
@@ -522,6 +543,11 @@ async def init_database():
 def get_db():
     """Database dependency for FastAPI (async)."""
     return database
+
+
+async def drop_database():
+    """Drop the entire database."""
+    await client.drop_database(DATABASE_NAME)
 '''
 
     def _generate_models_content(self) -> None:
@@ -742,18 +768,25 @@ volumes:
             if self.config["backend"] == "sqlalchemy":
                 imports.extend(
                     [
+                        "from contextlib import asynccontextmanager",
                         "from sqlalchemy import text",
                         "from app.db.database import engine, Base",
+                        "from app.db.database import SessionLocal",
                     ]
                 )
                 app_content.extend(
                     [
                         "",
-                        "# Create database tables",
-                        "Base.metadata.create_all(bind=engine)",
+                        "@asynccontextmanager",
+                        "async def lifespan(app: FastAPI):",
+                        "    # Create database tables",
+                        "    Base.metadata.create_all(bind=engine)",
+                        "    yield",
+                        "",
+                        "app = FastAPI(lifespan=lifespan)",
                     ]
                 )
-            else:
+            else:  # beanie
                 imports.extend(
                     [
                         "from contextlib import asynccontextmanager",
@@ -772,8 +805,7 @@ volumes:
                         "app = FastAPI(lifespan=lifespan)",
                     ]
                 )
-
-        if not app_content:
+        else:
             app_content = ["", "app = FastAPI()"]
 
         # Add routes
@@ -788,6 +820,73 @@ volumes:
             '    return {"status": "healthy"}',
         ]
 
+        # Add database-dependent routes if database is included
+        if self.config["include_database"]:
+            if self.config["backend"] == "sqlalchemy":
+                routes.extend(
+                    [
+                        "",
+                        "from sqlalchemy.orm import Session",
+                        "from app.db.database import get_db",
+                        "from app.models.user import User",
+                        "from app.models.item import Item",
+                        "from app.schemas.user import UserCreate, UserResponse",
+                        "from app.schemas.item import ItemCreate, ItemResponse",
+                        "",
+                        "@app.get('/users', response_model=list[UserResponse])",
+                        "async def get_users(db: Session = get_db()):",
+                        "    users = db.query(User).all()",
+                        "    return users",
+                        "",
+                        "@app.post('/users', response_model=UserResponse)",
+                        "async def create_user(user: UserCreate, db: Session = get_db()):",
+                        "    from app.crud.user import create_user as crud_create_user",
+                        "    return crud_create_user(db=db, user=user)",
+                        "",
+                        "@app.get('/items', response_model=list[ItemResponse])",
+                        "async def get_items(db: Session = get_db()):",
+                        "    items = db.query(Item).all()",
+                        "    return items",
+                        "",
+                        "@app.post('/items', response_model=ItemResponse)",
+                        "async def create_item(item: ItemCreate, db: Session = get_db()):",
+                        "    from app.crud.item import create_item as crud_create_item",
+                        "    return crud_create_item(db=db, item=item)",
+                    ]
+                )
+            else:  # beanie
+                routes.extend(
+                    [
+                        "",
+                        "from beanie import PydanticObjectId",
+                        "from app.models.user import User",
+                        "from app.models.item import Item",
+                        "from app.schemas.user import UserCreate, UserResponse",
+                        "from app.schemas.item import ItemCreate, ItemResponse",
+                        "",
+                        "@app.get('/users', response_model=list[UserResponse])",
+                        "async def get_users():",
+                        "    users = await User.find_all().to_list()",
+                        "    return users",
+                        "",
+                        "@app.post('/users', response_model=UserResponse)",
+                        "async def create_user(user: UserCreate):",
+                        "    from app.crud.user import create_user as crud_create_user",
+                        "    return await crud_create_user(user=user)",
+                        "",
+                        "@app.get('/items', response_model=list[ItemResponse])",
+                        "async def get_items():",
+                        "    items = await Item.find_all().to_list()",
+                        "    return items",
+                        "",
+                        "@app.post('/items', response_model=ItemResponse)",
+                        "async def create_item(item: ItemCreate):",
+                        "    from app.crud.item import create_item as crud_create_item",
+                        "    return await crud_create_item(item=item)",
+                    ]
+                )
+
+        # Add authentication routes if auth is included
         if self.config["include_auth"]:
             routes.extend(
                 [

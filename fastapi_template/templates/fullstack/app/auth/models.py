@@ -12,10 +12,8 @@ if settings.BACKEND_TYPE == "sqlalchemy":
     # SQLAlchemy backend imports
     from app.db.database import Base
     from fastapi_users.db import SQLAlchemyBaseUserTable
-    from sqlalchemy import Boolean, Column, DateTime, String
-    from sqlalchemy.ext.declarative import declarative_base
+    from sqlalchemy import Column, String
     from sqlalchemy.orm import relationship
-    from sqlalchemy.sql import func
 
     class User(SQLAlchemyBaseUserTable, Base):
         """User model for FastAPI-Users with SQLAlchemy."""

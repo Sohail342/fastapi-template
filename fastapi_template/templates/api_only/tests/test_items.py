@@ -2,7 +2,6 @@
 Tests for the items router.
 """
 
-import pytest
 from app.main import app
 from fastapi.testclient import TestClient
 
