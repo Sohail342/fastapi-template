@@ -81,5 +81,5 @@ target-version = "py38"
 exclude = [".venv", "venv", "fastapi_template_cli.egg-info"]
 
 [tool.uv.workspace]
-members = ["myapp"]
+members = ["myapp", "apple"]
 
