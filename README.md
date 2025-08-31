@@ -18,7 +18,7 @@ A powerful CLI tool for generating production-ready FastAPI projects with best p
 ### Installation
 
 ```bash
-pip install fastapi-template
+pip install fastapi-template-cli
 ```
 
 ### Create a New Project
