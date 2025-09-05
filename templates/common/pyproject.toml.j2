@@ -10,7 +10,7 @@ authors = [
     {name = "{{ author }}"},
 ]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -22,35 +22,39 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
+
 dependencies = [
-    "fastapi>=0.104.0",
-    "uvicorn[standard]>=0.24.0",
-    "pydantic>=2.4.0",
-    "python-dotenv>=1.0.0",
-    "fastapi-users[{{ orm }}]>=12.1.0",
-    {% if orm == "sqlalchemy" -%}
-    "sqlalchemy>=2.0.0",
-    "alembic>=1.12.0",
-    "psycopg2-binary>=2.9.0",
-    "asyncpg>=0.29.0",
-    {% elif orm == "beanie" -%}
-    "beanie>=1.23.0",
-    "motor>=3.3.0",
-    {% endif -%}
-    "passlib[bcrypt]>=1.7.4",
-    "python-multipart>=0.0.6",
-    "python-jose[cryptography]>=3.3.0",
+    "fastapi>=0.116,<0.117",
+    "uvicorn[standard]>=0.35,<0.36",
+    "pydantic>=2.11,<2.12",
+    "python-dotenv>=1.1,<1.2",
+    "fastapi-users[{{ orm_type }}]>=14.0,<15.0",
+    "python-multipart>=0.0.20,<0.1.0",
+    "pydantic-settings>=2.10,<2.11",
+    {% if orm_type == "sqlalchemy" %}
+    "alembic>=1.15,<1.16",
+    {% endif %}
 ]
 
 [project.optional-dependencies]
+
+prod = [
+    {% if orm_type == "sqlalchemy" %}
+    "asyncpg>=0.30,<0.31",
+    {% endif %}
+    {% if project_type == "fullstack" %}
+    "celery>=5.3,<6.0",
+    "redis>=6.4,<6.5",
+    {% endif %}
+]
+
 dev = [
-    "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
-    "httpx>=0.25.0",
-    "black>=23.0.0",
-    "isort>=5.12.0",
-    "flake8>=6.0.0",
-    "mypy>=1.5.0",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "httpx>=0.28.1",
+    "ruff>=0.12.11",
+    "mypy>=1.17.1",
+    "aiosqlite>=0.17,<0.18",
 ]
 
 [project.urls]
@@ -58,21 +62,27 @@ Homepage = "https://github.com/{{ author }}/{{ project_name }}"
 Repository = "https://github.com/{{ author }}/{{ project_name }}"
 
 [project.scripts]
-{{ project_slug }} = "app.main:main"
+{{ project_name | snake_case }} = "app.main:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["app*"]
 
-[tool.black]
+[tool.ruff]
 line-length = 88
-target-version = ['py38']
-include = '\.pyi?$'
+target-version = "py38"
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-line_length = 88
+# Enable import sorting
+extend-select = ["I"]
+
+# Automatically apply safe fixes (when using `ruff check --fix`)
+fix = true
+
+[tool.ruff.isort]
+known-first-party = ["app"]
+combine-as-imports = true
+force-single-line = false
+
 
 [tool.mypy]
 python_version = "3.8"

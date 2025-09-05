@@ -1,5 +1,7 @@
 """Database session configuration for SQLAlchemy (Fullstack)."""
 
+from collections.abc import AsyncGenerator
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -15,14 +17,6 @@ async_engine = create_async_engine(
     pool_recycle=300,
 )
 
-# Sync engine for Alembic and Celery tasks
-sync_engine = create_engine(
-    settings.SYNC_DATABASE_URL,
-    echo=settings.ENVIRONMENT == "development",
-    pool_pre_ping=True,
-    pool_recycle=300,
-)
-
 # Async session factory for FastAPI
 AsyncSessionLocal = sessionmaker(
     bind=async_engine,
@@ -30,27 +24,10 @@ AsyncSessionLocal = sessionmaker(
     expire_on_commit=False,
 )
 
-# Sync session factory for Celery tasks
-SyncSessionLocal = sessionmaker(
-    bind=sync_engine,
-    autocommit=False,
-    autoflush=False,
-)
-
-
-async def get_db():
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Dependency to get async database session for FastAPI."""
     async with AsyncSessionLocal() as session:
         try:
             yield session
         finally:
             await session.close()
-
-
-def get_sync_db():
-    """Get sync database session for Celery tasks."""
-    db = SyncSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()

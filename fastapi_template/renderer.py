@@ -1,6 +1,5 @@
 """Template rendering functionality using Jinja2."""
 
-import os
 import shutil
 from pathlib import Path
 from typing import Any, Dict
@@ -17,7 +16,7 @@ class TemplateRenderer:
         Args:
             template_dir: Path to the templates directory
         """
-        self.template_dir = template_dir
+        self.template_dir = template_dir.resolve()
         self.env = Environment(
             loader=FileSystemLoader(str(template_dir)),
             trim_blocks=True,
@@ -140,6 +139,8 @@ class TemplateRenderer:
             target_dir: Directory to create the project in
             additional_context: Additional template variables
         """
+        target_dir = target_dir.resolve()
+        target_dir.mkdir(parents=True, exist_ok=True)
         if additional_context is None:
             additional_context = {}
 

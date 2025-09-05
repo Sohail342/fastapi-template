@@ -1,56 +1,19 @@
 """User schemas for FastAPI-Users integration."""
 
-from typing import Optional
-
-from pydantic import BaseModel, EmailStr
-
-
-class UserBase(BaseModel):
-    email: Optional[EmailStr] = None
-    is_active: Optional[bool] = True
-    is_superuser: bool = False
-    full_name: Optional[str] = None
+import uuid
+from fastapi_users import schemas
 
 
-class UserCreate(UserBase):
-    email: EmailStr
-    password: str
+class UserRead(schemas.BaseUser[uuid.UUID]):
+    first_name: str | None = None
+    last_name: str | None = None
 
 
-class UserUpdate(UserBase):
-    password: Optional[str] = None
+class UserCreate(schemas.BaseUserCreate):
+    first_name: str
+    last_name: str
 
 
-class UserInDBBase(UserBase):
-    id: Optional[int] = None
-
-    class Config:
-        orm_mode = True
-
-
-class User(UserInDBBase):
-    pass
-
-
-class UserInDB(UserInDBBase):
-    hashed_password: str
-
-
-class UserRead(UserInDBBase):
-    pass
-
-
-class UserCreateOpen(BaseModel):
-    email: EmailStr
-    password: str
-    full_name: Optional[str] = None
-
-
-class UserUpdateMe(BaseModel):
-    full_name: Optional[str] = None
-    email: Optional[EmailStr] = None
-
-
-class UpdatePassword(BaseModel):
-    current_password: str
-    new_password: str
+class UserUpdate(schemas.BaseUserUpdate):
+    first_name: str | None = None
+    last_name: str | None = None

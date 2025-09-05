@@ -104,7 +104,6 @@ def new(
         typer.echo()
         typer.echo("Next steps:")
         typer.echo(f"  cd {name}")
-        typer.echo("  pip install -e .")
 
         if orm == "sqlalchemy":
             typer.echo("  # Initialize database:")

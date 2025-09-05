@@ -3,22 +3,25 @@
 import secrets
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import AnyHttpUrl, BaseSettings, EmailStr, HttpUrl, PostgresDsn, validator
+from pydantic import AnyHttpUrl, EmailStr, field_validator
+from pydantic_settings import BaseSettings
+from pydantic_core.core_schema import ValidationInfo
 
 
 class Settings(BaseSettings):
+    ENVIRONMENT: str = "development"
+    DEBUG: bool = True
+    ALGORITHM: str = "HS256"
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     SERVER_NAME: str = "{{ project_name }}"
     SERVER_HOST: AnyHttpUrl = "http://localhost:8000"
-    # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
-    # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
-    # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
-    @validator("BACKEND_CORS_ORIGINS", pre=True)
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
+    @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
@@ -27,54 +30,72 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     PROJECT_NAME: str = "{{ project_name }}"
-    {% if description -%}
+    {% if description %}
     PROJECT_DESCRIPTION: str = "{{ description }}"
-    {% else -%}
+    {% else %}
     PROJECT_DESCRIPTION: str = "A FastAPI application"
-    {% endif -%}
+    {% endif %}
 
-    {% if orm == "sqlalchemy" -%}
-    DATABASE_URL: str = "postgresql+asyncpg://user:password@localhost/{{ project_slug }}"
-    SYNC_DATABASE_URL: str = "postgresql://user:password@localhost/{{ project_slug }}"
-    {% elif orm == "beanie" -%}
+    {% if orm_type == "sqlalchemy" %}
+    DATABASE_URL: Optional[str] = None
+    SYNC_DATABASE_URL: Optional[str] = None
+
+    def model_post_init(self, __context: Any) -> None:
+        """Set default DB URLs based on environment if not provided in .env"""
+        if not self.DATABASE_URL:
+            if self.ENVIRONMENT == "development":
+                self.DATABASE_URL = "sqlite+aiosqlite:///./app.db"
+            else:
+                self.DATABASE_URL = "postgresql+asyncpg://user:password@localhost/myapp"
+
+        if not self.SYNC_DATABASE_URL:
+            if self.ENVIRONMENT == "development":
+                self.SYNC_DATABASE_URL = "sqlite:///./app.db"
+            else:
+                self.SYNC_DATABASE_URL = "postgresql://user:password@localhost/myapp"
+        
+    {% elif orm_type == "beanie" %}
     MONGODB_URL: str = "mongodb://localhost:27017"
     DATABASE_NAME: str = "{{ project_slug }}"
-    {% endif -%}
+    {% endif %}
 
     SMTP_TLS: bool = True
     SMTP_PORT: Optional[int] = None
     SMTP_HOST: Optional[str] = None
     SMTP_USER: Optional[str] = None
     SMTP_PASSWORD: Optional[str] = None
-    EMAILS_FROM_EMAIL: Optional[EmailStr] = None
+    EMAILS_FROM_EMAIL: Optional[EmailStr] = "noreply@example.com"
     EMAILS_FROM_NAME: Optional[str] = "{{ project_name }}"
 
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
     EMAIL_TEMPLATES_DIR: str = "/app/app/email-templates/build"
     EMAILS_ENABLED: bool = False
 
-    @validator("EMAILS_ENABLED", pre=True)
-    def get_emails_enabled(cls, v: bool, values: Dict[str, Any]) -> bool:
+    @field_validator("EMAILS_ENABLED", mode="before")
+    @classmethod
+    def get_emails_enabled(cls, v: bool, info: ValidationInfo) -> bool:
         return bool(
-            values.get("SMTP_HOST")
-            and values.get("SMTP_PORT")
-            and values.get("EMAILS_FROM_EMAIL")
+            info.data.get("SMTP_HOST")
+            and info.data.get("SMTP_PORT")
+            and info.data.get("EMAILS_FROM_EMAIL")
         )
 
-    EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
-    FIRST_SUPERUSER: EmailStr = "admin@{{ project_slug }}.com"
+    EMAIL_TEST_USER: EmailStr = "test@example.com"
+    FIRST_SUPERUSER: EmailStr = "admin@example.com"
     FIRST_SUPERUSER_PASSWORD: str = "admin"
     USERS_OPEN_REGISTRATION: bool = False
 
-    {% if project_type == "fullstack" -%}
+    {% if project_type == "fullstack" %}
     REDIS_URL: str = "redis://localhost:6379"
     CELERY_BROKER_URL: str = "redis://localhost:6379/0"
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/0"
-    {% endif -%}
+    {% endif %}
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = {
+        "env_file": ".env",
+        "case_sensitive": True,
+        "extra": "ignore",
+    }
 
 
 settings = Settings()
