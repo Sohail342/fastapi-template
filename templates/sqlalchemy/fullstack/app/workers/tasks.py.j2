@@ -4,10 +4,9 @@ import time
 from typing import Any, Dict
 
 from celery import shared_task
-from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.db.session import get_sync_db
+from app.db.session import get_db
 from app.models.user import User
 
 
@@ -29,7 +28,7 @@ def send_email_task(to_email: str, subject: str, body: str) -> Dict[str, Any]:
 @shared_task
 def process_user_registration(user_id: int) -> Dict[str, Any]:
     """Process user registration tasks."""
-    db = next(get_sync_db())
+    db = next(get_db())
     try:
         user = db.query(User).filter(User.id == user_id).first()
         if user:

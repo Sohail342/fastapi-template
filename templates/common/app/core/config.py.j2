@@ -17,7 +17,6 @@ class Settings(BaseSettings):
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     SERVER_NAME: str = "{{ project_name }}"
-    SERVER_HOST: AnyHttpUrl = "http://localhost:8000"
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
@@ -41,18 +40,19 @@ class Settings(BaseSettings):
     SYNC_DATABASE_URL: Optional[str] = None
 
     def model_post_init(self, __context: Any) -> None:
-        """Set default DB URLs based on environment if not provided in .env"""
+        """Set default DB URLs if missing."""
         if not self.DATABASE_URL:
-            if self.ENVIRONMENT == "development":
-                self.DATABASE_URL = "sqlite+aiosqlite:///./app.db"
-            else:
-                self.DATABASE_URL = "postgresql+asyncpg://user:password@localhost/myapp"
-
+            self.DATABASE_URL = (
+                "sqlite+aiosqlite:///./app.db"
+                if self.ENVIRONMENT == "development"
+                else "postgresql+asyncpg://postgres:postgres@db:5432/ecommerce"
+            )
         if not self.SYNC_DATABASE_URL:
-            if self.ENVIRONMENT == "development":
-                self.SYNC_DATABASE_URL = "sqlite:///./app.db"
-            else:
-                self.SYNC_DATABASE_URL = "postgresql://user:password@localhost/myapp"
+            self.SYNC_DATABASE_URL = (
+                "sqlite:///./app.db"
+                if self.ENVIRONMENT == "development"
+                else "postgresql://postgres:postgres@db:5432/ecommerce"
+            )
         
     {% elif orm_type == "beanie" %}
     MONGODB_URL: str = "mongodb://localhost:27017"
@@ -86,9 +86,10 @@ class Settings(BaseSettings):
     USERS_OPEN_REGISTRATION: bool = False
 
     {% if project_type == "fullstack" %}
-    REDIS_URL: str = "redis://localhost:6379"
-    CELERY_BROKER_URL: str = "redis://localhost:6379/0"
-    CELERY_RESULT_BACKEND: str = "redis://localhost:6379/0"
+    # Redis / Celery
+    REDIS_URL: str = "redis://redis:6379"
+    CELERY_BROKER_URL: str = "redis://redis:6379/0"
+    CELERY_RESULT_BACKEND: str = "redis://redis:6379/0"
     {% endif %}
 
     model_config = {

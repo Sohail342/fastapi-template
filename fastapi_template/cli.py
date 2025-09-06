@@ -6,6 +6,7 @@ from typing import Optional
 
 from fastapi_template.renderer import TemplateRenderer
 
+
 app = typer.Typer(
     name="fastapi-template",
     help="Generate FastAPI projects with best practices",

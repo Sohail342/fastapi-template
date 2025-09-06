@@ -34,11 +34,6 @@ dependencies = [
     {% if orm_type == "sqlalchemy" %}
     "alembic>=1.15,<1.16",
     {% endif %}
-]
-
-[project.optional-dependencies]
-
-prod = [
     {% if orm_type == "sqlalchemy" %}
     "asyncpg>=0.30,<0.31",
     {% endif %}
@@ -48,13 +43,19 @@ prod = [
     {% endif %}
 ]
 
+[project.optional-dependencies]
+
+prod = [
+    "gunicorn>=21.2,<22.0",
+]
+
 dev = [
     "pytest>=8.4.1",
     "pytest-asyncio>=1.1.0",
     "httpx>=0.28.1",
     "ruff>=0.12.11",
     "mypy>=1.17.1",
-    "aiosqlite>=0.17,<0.18",
+    "pre-commit>=3.7.0",
 ]
 
 [project.urls]
