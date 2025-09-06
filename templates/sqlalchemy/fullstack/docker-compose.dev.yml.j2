@@ -12,6 +12,7 @@ services:
       - "8000:8000"
     volumes:
       - ./app:/app/app  # Mount source for live reload
+      - ./alembic:/app/alembic
     command: >
       uvicorn app.main:app
       --host 0.0.0.0
