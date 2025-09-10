@@ -1,6 +1,7 @@
 """Database session configuration for SQLAlchemy."""
 
-from sqlalchemy import create_engine
+from collections.abc import AsyncGenerator
+
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -11,15 +12,11 @@ async_engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.ENVIRONMENT == "development",
     future=True,
+    pool_pre_ping=True,
+    pool_recycle=300,
 )
 
-# Sync engine for Alembic
-sync_engine = create_engine(
-    settings.SYNC_DATABASE_URL,
-    echo=settings.ENVIRONMENT == "development",
-)
-
-# Async session factory
+# Async session factory for FastAPI
 AsyncSessionLocal = sessionmaker(
     bind=async_engine,
     class_=AsyncSession,
@@ -27,8 +24,8 @@ AsyncSessionLocal = sessionmaker(
 )
 
 
-async def get_db():
-    """Dependency to get database session."""
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """Dependency to get async database session for FastAPI."""
     async with AsyncSessionLocal() as session:
         try:
             yield session

@@ -4,9 +4,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.users import fastapi_users
+from app.core.users import fastapi_users
 from app.core.security import auth_backend
+{% if project_type == "api" %}
 from app.api.v1.api import api_router
+{% else %}
+from app.routers.test import router
+{% endif %}
 from app.schemas.user import UserRead, UserCreate, UserUpdate
 
 {% if orm == "beanie" -%}
@@ -20,9 +24,11 @@ def create_application() -> FastAPI:
         title=settings.PROJECT_NAME,
         description=settings.PROJECT_DESCRIPTION,
         version="0.1.0",
+        {% if project_type == "api" %}
         openapi_url=f"{settings.API_V1_STR}/openapi.json",
         docs_url=f"{settings.API_V1_STR}/docs",
         redoc_url=f"{settings.API_V1_STR}/redoc",
+        {% endif %}
     )
 
     # Set up CORS
@@ -58,8 +64,11 @@ def create_application() -> FastAPI:
     )
 
     # Add Custom Routes
+    {% if project_type == "api" %}
     application.include_router(api_router, prefix="/api/v1", tags=["api"])
-
+    {% else %}
+    application.include_router(router, prefix="/api", tags=["api"])
+    {% endif %}
     return application
 
 
@@ -73,5 +82,9 @@ def root():
     return {
         "message": f"Welcome to {settings.PROJECT_NAME}",
         "version": "0.1.0",
+        {% if project_type == "api" %}
         "docs": f"{settings.API_V1_STR}/docs",
+        {% else %}
+        "docs": "/docs",
+        {% endif %}
     }

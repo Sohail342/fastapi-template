@@ -243,21 +243,3 @@ celerybeat-schedule
 celerybeat.pid
 """
         (target_dir / ".gitignore").write_text(gitignore_content)
-
-        # Create empty __init__.py files for proper Python packages
-        init_files = [
-            "app",
-            "app/api",
-            "app/api/v1",
-            "app/api/v1/endpoints",
-            "app/core",
-            "app/db",
-            "app/models",
-            "app/schemas",
-            "app/workers",
-        ]
-
-        for init_path in init_files:
-            init_file = target_dir / init_path / "__init__.py"
-            init_file.parent.mkdir(parents=True, exist_ok=True)
-            init_file.touch()

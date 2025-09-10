@@ -1,6 +1,12 @@
-# FastAPI Template
+<p align="center">
+  <img src="docs/fastapi-template-logo.svg" alt="FastAPI Template Logo" width="400">
+</p>
 
-A powerful CLI tool for generating production-ready FastAPI projects with best practices, integrated authentication, and flexible ORM options.
+<h1 align="center">FastAPI Template</h1>
+
+<p align="center">
+  <strong>A powerful CLI tool for generating production-ready FastAPI projects with best practices, integrated authentication, and flexible ORM options.</strong>
+</p>
 
 ## Features
 
@@ -30,7 +36,7 @@ fastapi-template new my-api --orm sqlalchemy --type api
 # Create a fullstack project with MongoDB
 fastapi-template new my-app --orm beanie --type fullstack
 
-# Create with custom description
+# Create with project description
 fastapi-template new my-project --orm sqlalchemy --type fullstack \
   --description "My awesome FastAPI project" --author "Your Name"
 ```
@@ -112,6 +118,93 @@ myproject/
 ├── pyproject.toml
 ├── .env
 └── .gitignore
+```
+
+## Template Comparison
+
+### Fullstack Template
+- **Includes Redis** as Celery broker and result backend
+- **Separate Celery worker** for long-running tasks
+- **Celery Beat** for scheduled tasks
+- **Complete frontend integration**
+- **Production-ready Docker setup**
+
+### API Template
+- **Lightweight FastAPI core**
+- **Database-only backend**
+- **Minimal dependencies**
+- **Optimized for microservices**
+- **Simplified Docker setup**
+
+## Project Structure Details
+
+### API Template (`/d:/Projects dir/cli-tool/e-commerce/`)
+```
+e-commerce/
+├── app/
+│   ├── api/v1/
+│   │   ├── api.py              # Main API router
+│   │   └── endpoints/
+│   │       └── users.py        # User endpoints
+│   ├── core/
+│   │   ├── config.py           # Application configuration
+│   │   ├── security.py         # Security utilities
+│   │   └── users.py           # User management
+│   ├── database/
+│   │   ├── base.py            # Database base setup
+│   │   ├── base_class.py      # Base model class
+│   │   └── session.py         # Database session
+│   ├── models/
+│   │   └── users.py           # User models
+│   ├── schemas/
+│   │   └── user.py            # Pydantic schemas
+│   ├── users/
+│   │   ├── dependencies.py    # User dependencies
+│   │   └── manager.py         # User manager
+│   └── main.py                # FastAPI application
+├── alembic/                   # Database migrations
+├── docker/                    # Docker configuration
+├── tests/                     # Test files
+├── .env.dev                   # Development environment
+├── .env.prod                  # Production environment
+└── pyproject.toml            # Project dependencies
+```
+
+### Fullstack Template (`/d:/Projects dir/cli-tool/full-erp/`)
+```
+full-erp/
+├── app/
+│   ├── core/
+│   │   ├── config.py           # Application configuration
+│   │   ├── security.py         # Security utilities
+│   │   └── users.py           # User management
+│   ├── database/
+│   │   ├── base.py            # Database base setup
+│   │   ├── base_class.py      # Base model class
+│   │   └── session.py         # Database session
+│   ├── models/
+│   │   └── users.py           # User models
+│   ├── routers/
+│   │   └── test.py            # Test endpoints
+│   ├── schemas/
+│   │   └── user.py            # Pydantic schemas
+│   ├── services/              # Business logic services
+│   ├── users/
+│   │   ├── dependencies.py    # User dependencies
+│   │   └── manager.py         # User manager
+│   ├── utils/                 # Utility functions
+│   ├── workers/
+│   │   ├── celery_app.py      # Celery configuration
+│   │   └── tasks.py           # Background tasks
+│   └── main.py                # FastAPI application
+├── alembic/                   # Database migrations
+├── docker/                    # Docker configuration
+├── tests/                     # Test files
+├── .env.dev                   # Development environment
+├── .env.prod                  # Production environment
+├── docker-compose.dev.yml     # Development Docker setup
+├── docker-compose.prod.yml    # Production Docker setup
+└── pyproject.toml            # Project dependencies
 ```
 
 ## Development
@@ -274,18 +367,20 @@ docker-compose down
    gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
    ```
 
-3. **Nginx Reverse Proxy**
-   ```nginx
-   server {
-       listen 80;
-       server_name your-domain.com;
-       
-       location / {
-           proxy_pass http://localhost:8000;
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-       }
-   }
+3. **Traefik Reverse Proxy**
+   Both templates includes Traefik configuration in `docker-compose.prod.yml`:
+   ```yaml
+   services:
+     traefik:
+       image: traefik:v3.0
+       command:
+         - --api.dashboard=true
+         - --providers.docker=true
+         - --entrypoints.web.address=:80
+         - --entrypoints.websecure.address=:443
+         - --certificatesresolvers.letsencrypt.acme.tlschallenge=true
+         - --certificatesresolvers.letsencrypt.acme.email=your-email@domain.com
+         - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
    ```
 
 ## Contributing

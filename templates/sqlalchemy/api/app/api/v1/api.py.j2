@@ -1,0 +1,8 @@
+"""API v1 router configuration."""
+
+from fastapi import APIRouter, Depends
+from app.core.users import current_active_user
+from app.api.v1.endpoints import test
+
+api_router = APIRouter(dependencies=[Depends(current_active_user)])
+api_router.include_router(test.router)

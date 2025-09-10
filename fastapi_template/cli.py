@@ -83,7 +83,7 @@ def new(
     additional_context = {
         "description": description or f"A FastAPI {project_type} project using {orm}",
         "author": author or "FastAPI Template",
-        "year": 2024,
+        "year": 2025,
     }
 
     typer.echo(f"🚀 Creating FastAPI {project_type} project: {name}")
