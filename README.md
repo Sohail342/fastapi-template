@@ -138,7 +138,7 @@ myproject/
 
 ## Project Structure Details
 
-### API Template (`/d:/Projects dir/cli-tool/e-commerce/`)
+### API Template
 ```
 e-commerce/
 ├── app/
@@ -170,7 +170,7 @@ e-commerce/
 └── pyproject.toml            # Project dependencies
 ```
 
-### Fullstack Template (`/d:/Projects dir/cli-tool/full-erp/`)
+### Fullstack Template
 ```
 full-erp/
 ├── app/
@@ -318,24 +318,6 @@ Generated projects include these endpoints:
 - `GET /users/{id}` - Get user by ID
 - `GET /users` - List users (admin only)
 
-### Health Check
-- `GET /health` - API health status
-- `GET /` - Welcome message
-
-## Testing
-
-Generated projects include testing setup:
-
-```bash
-# Run tests
-pytest
-
-# Run with coverage
-pytest --cov=app tests/
-
-# Run specific test file
-pytest tests/test_users.py
-```
 
 ## Deployment
 
