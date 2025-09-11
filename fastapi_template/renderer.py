@@ -5,6 +5,18 @@ from pathlib import Path
 from typing import Any, Dict
 
 from jinja2 import Environment, FileSystemLoader, Template
+import importlib.resources as resources
+
+def get_template_dir() -> Path:
+    """
+    Locate the bundled templates inside the installed package.
+    Falls back to filesystem path in editable mode.
+    """
+    try:
+        return resources.files("fastapi_template") / "templates"
+    except Exception:
+        # Fallback: editable mode (directly from source tree)
+        return Path(__file__).parent / "templates"
 
 
 class TemplateRenderer:

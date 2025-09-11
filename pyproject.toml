@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fastapi-template-cli"
-version = "1.2.8"
+version = "1.2.9"
 description = "A powerful CLI tool for generating production-ready FastAPI applications with SQLAlchemy and MongoDB support"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -49,6 +49,9 @@ Issues = "https://github.com/Sohail342/fastapi-template/issues"
 
 [project.scripts]
 fastapi-template = "fastapi_template.cli:app"
+
+[tool.setuptools]
+include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]

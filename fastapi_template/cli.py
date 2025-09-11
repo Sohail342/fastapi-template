@@ -4,7 +4,7 @@ import typer
 from pathlib import Path
 from typing import Optional
 
-from fastapi_template.renderer import TemplateRenderer
+from fastapi_template.renderer import TemplateRenderer, get_template_dir
 
 
 app = typer.Typer(
@@ -76,7 +76,7 @@ def new(
         shutil.rmtree(project_dir)
 
     # Initialize renderer
-    template_dir = Path(__file__).parent.parent / "templates"
+    template_dir = get_template_dir()
     renderer = TemplateRenderer(template_dir)
 
     # Additional context
