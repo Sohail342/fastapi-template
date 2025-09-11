@@ -7,6 +7,7 @@ from typing import Any, Dict
 from jinja2 import Environment, FileSystemLoader, Template
 import importlib.resources as resources
 
+
 def get_template_dir() -> Path:
     """
     Locate the bundled templates inside the installed package.
