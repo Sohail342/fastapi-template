@@ -6,7 +6,7 @@ from typing import Any, Dict
 from celery import shared_task
 
 from app.database.session import get_db
-from app.models.user import User
+from app.models.users import User
 
 
 @shared_task(bind=True)
