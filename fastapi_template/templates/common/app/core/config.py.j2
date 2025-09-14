@@ -45,18 +45,21 @@ class Settings(BaseSettings):
             self.DATABASE_URL = (
                 "sqlite+aiosqlite:///./app.db"
                 if self.ENVIRONMENT == "development"
-                else "postgresql+asyncpg://postgres:postgres@db:5432/ecommerce"
+                else "postgresql+asyncpg://postgres:postgres@db:5432/{{ project_name }}"
             )
         if not self.SYNC_DATABASE_URL:
             self.SYNC_DATABASE_URL = (
                 "sqlite:///./app.db"
                 if self.ENVIRONMENT == "development"
-                else "postgresql://postgres:postgres@db:5432/ecommerce"
+                else "postgresql://postgres:postgres@db:5432/{{ project_name }}"
             )
 
     {% elif orm_type == "beanie" %}
-    MONGODB_URL: str = "mongodb://localhost:27017"
-    DATABASE_NAME: str = "{{ project_slug }}"
+    # MongoDB Configuration
+    MONGO_USER: Optional[str] = "root"
+    MONGO_PASSWORD: Optional[str] = "secret"
+    MONGO_DB: Optional[str] = "{{ project_name }}"
+    MONGODB_URL: str = "mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/${MONGO_DB}?authSource=admin"
     {% endif %}
 
     SMTP_TLS: bool = True

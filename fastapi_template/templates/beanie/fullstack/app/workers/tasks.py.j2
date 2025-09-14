@@ -7,7 +7,7 @@ from celery import Task
 from celery.utils.log import get_task_logger
 
 from app.core.config import settings
-from app.models.user import User
+from app.models.users import User
 from app.workers.celery_app import celery_app
 
 logger = get_task_logger(__name__)

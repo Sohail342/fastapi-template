@@ -13,13 +13,15 @@ from app.routers.test import router
 {% endif %}
 from app.schemas.user import UserRead, UserCreate, UserUpdate
 
-{% if orm == "beanie" -%}
-from app.db.mongo import init_db
+{% if orm_type == "beanie" %}
+from contextlib import asynccontextmanager
+from app.database.mongo import init_db, close_db
 {% endif %}
 
 
 def create_application() -> FastAPI:
     """Create FastAPI app with middleware and routes."""
+
     application = FastAPI(
         title=settings.PROJECT_NAME,
         description=settings.PROJECT_DESCRIPTION,
@@ -32,6 +34,9 @@ def create_application() -> FastAPI:
         openapi_url=None if settings.ENVIRONMENT == "production" else "/openapi.json",
         docs_url=None if settings.ENVIRONMENT == "production" else "/docs",
         redoc_url=None if settings.ENVIRONMENT == "production" else "/redoc",
+        {% endif %}
+        {% if orm_type == "beanie" %}
+        lifespan=lifespan,
         {% endif %}
     )
 
@@ -76,8 +81,18 @@ def create_application() -> FastAPI:
     return application
 
 
-app = create_application()
+{% if orm_type == "beanie" %}
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    try:
+        yield
+    finally:
+         await close_db()
 
+
+{% endif %}
+app = create_application()
 
 
 @app.get("/")

@@ -6,7 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import Depends
 
 from app.core.config import settings
-from app.models.user import User
+from app.database.base import document_models
 
 client: AsyncIOMotorClient | None = None
 
@@ -15,11 +15,11 @@ async def init_db() -> None:
     """Initialize database connection and Beanie."""
     global client
     client = AsyncIOMotorClient(settings.MONGODB_URL)
-    database = client[settings.DATABASE_NAME]
+    database = client[settings.MONGO_DB]
 
     # Initialize Beanie with the User document class
     from beanie import init_beanie
-    await init_beanie(database, document_models=[User])
+    await init_beanie(database, document_models=document_models)
 
 
 async def close_db() -> None:
