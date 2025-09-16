@@ -55,7 +55,7 @@ services:
       - mongo_backups:/backups
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "mongo --username ${MONGO_USER} --password ${MONGO_PASSWORD} --eval 'db.adminCommand(\"ping\")'"]
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/127.0.0.1/27017"]
       interval: 10s
       timeout: 5s
       retries: 5
