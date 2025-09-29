@@ -18,6 +18,12 @@ services:
       --max-requests-jitter ${GUNICORN_MAX_REQUESTS_JITTER:-100}
     expose:
       - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       - traefik.enable=true
 
@@ -32,12 +38,18 @@ services:
       - traefik.http.routers.web-secure.tls.certresolver=myresolver
       - traefik.http.routers.web-secure.middlewares=security-headers,rate-limit
 
+      # Service port
+      - traefik.http.services.web.loadbalancer.server.port=8000
+
+      # Traefik service healthcheck (so Traefik stops routing to unhealthy instances)
+      - traefik.http.services.web.loadbalancer.healthcheck.path=/health
+      - traefik.http.services.web.loadbalancer.healthcheck.interval=10s
+      - traefik.http.services.web.loadbalancer.healthcheck.timeout=3s
+
       # Rate limiting middleware
       - traefik.http.middlewares.rate-limit.ratelimit.average=100
       - traefik.http.middlewares.rate-limit.ratelimit.burst=50
 
-      # Service port
-      - traefik.http.services.web.loadbalancer.server.port=8000
     networks:
       - backend
       - traefik
@@ -168,6 +180,10 @@ services:
       - "traefik.http.routers.dashboard.entrypoints=websecure"
       # Dashboard middleware
       - "traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+
+      # Redirect www to non-www
+      - "traefik.http.middlewares.redirect-to-nonwww.redirectregex.regex=^https://www\\.${DOMAIN}/(.*)"
+      - "traefik.http.middlewares.redirect-to-nonwww.redirectregex.replacement=https://${DOMAIN}/$1"
 
       # Global middlewares (defined on traefik container to ensure availability)
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"

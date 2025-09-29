@@ -254,5 +254,9 @@ htmlcov/
 # Celery
 celerybeat-schedule
 celerybeat.pid
+
+#env variables
+.env.prod
+.env.dev
 """
         (target_dir / ".gitignore").write_text(gitignore_content)

@@ -74,12 +74,12 @@ line-length = 88
 target-version = "py38"
 
 # Enable import sorting
-extend-select = ["I"]
+lint.extend-select = ["I"]
 
 # Automatically apply safe fixes (when using `ruff check --fix`)
 fix = true
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["app"]
 combine-as-imports = true
 force-single-line = false

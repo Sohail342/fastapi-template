@@ -106,3 +106,7 @@ def root():
         "docs": "/docs",
         {% endif %}
     }
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
