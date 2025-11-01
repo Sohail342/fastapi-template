@@ -31,5 +31,11 @@ COPY --from=builder /usr/local /usr/local
 # Copy source code
 COPY ./app ./app
 
+# Create a non-root user and switch to it
+RUN useradd -m appuser
+USER appuser
+
+HEALTHCHECK CMD curl --fail http://localhost:8000/health || exit 1
+
 # Default command (prod)
 CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "app.main:app", "-b", "0.0.0.0:8000", "--workers", "4", "--timeout", "120"]
