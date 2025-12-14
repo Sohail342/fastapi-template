@@ -184,7 +184,9 @@ class TemplateRenderer:
         # Remove excluded files/directories based on context
         self._cleanup_excluded_files(target_dir, context)
 
-    def _cleanup_excluded_files(self, target_dir: Path, context: Dict[str, Any]) -> None:
+    def _cleanup_excluded_files(
+        self, target_dir: Path, context: Dict[str, Any]
+    ) -> None:
         """Remove files or directories that should be excluded based on context."""
         import shutil
 
