@@ -14,7 +14,7 @@
 - 🔐 **Integrated Authentication**: FastAPI-Users integration with JWT authentication
 - 🗄️ **Flexible ORM**: Choose between SQLAlchemy (PostgreSQL) or Beanie (MongoDB)
 - 🐳 **Docker Support**: Complete Docker setup with docker-compose
-- 📦 **Celery Integration**: Background task processing (fullstack projects)
+- 📦 **Celery Integration**: Background task processing
 - 🧪 **Testing Ready**: Pre-configured testing setup
 - 📊 **API Documentation**: Auto-generated OpenAPI/Swagger documentation
 - 🎯 **CLI Driven**: Simple command-line interface for project generation
@@ -31,13 +31,13 @@ pip install fastapi-template-cli
 
 ```bash
 # Create an API-only project with SQLAlchemy
-fastapi-template new my-api --orm sqlalchemy --type api
+fastapi-template-cli new my-api --orm sqlalchemy --type api
 
-# Create a fullstack project with MongoDB
-fastapi-template new my-app --orm beanie --type fullstack
+# Create a modular project with MongoDB
+fastapi-template-cli new my-app --orm beanie --type modular
 
 # Create with project description
-fastapi-template new my-project --orm sqlalchemy --type fullstack \
+fastapi-template-cli new my-project --orm sqlalchemy --type modular \
   --description "My awesome FastAPI project" --author "Your Name"
 ```
 
@@ -49,7 +49,7 @@ fastapi-template new my-project --orm sqlalchemy --type fullstack \
 - FastAPI-Users authentication
 - No frontend or background tasks
 
-### Fullstack Projects
+### Modular Projects
 - Complete backend with FastAPI
 - Database integration
 - FastAPI-Users authentication
@@ -77,13 +77,13 @@ fastapi-template new my-project --orm sqlalchemy --type fullstack \
 
 ```bash
 # List available templates
-fastapi-template list-templates
+fastapi-template-cli list-templates
 
 # Create a new project
-fastapi-template new myproject
+fastapi-template-cli new myproject
 
 # Show version
-fastapi-template version
+fastapi-template-cli version
 ```
 
 ### Project Structure
@@ -112,9 +112,9 @@ myproject/
 │   └── main.py
 ├── docker/
 │   ├── Dockerfile
-│   └── docker-compose.yml (fullstack only)
+│   └── docker-compose.yml (modular only)
 ├── alembic/ (SQLAlchemy only)
-├── workers/ (fullstack only)
+├── workers/ (modular only)
 ├── pyproject.toml
 ├── .env
 └── .gitignore
@@ -122,7 +122,7 @@ myproject/
 
 ## Template Comparison
 
-### Fullstack Template
+### Modular Template
 - **Includes Redis** as Celery broker and result backend
 - **Separate Celery worker** for long-running tasks
 - **Celery Beat** for scheduled tasks
@@ -170,7 +170,7 @@ e-commerce/
 └── pyproject.toml            # Project dependencies
 ```
 
-### Fullstack Template
+### Modular Template
 ```
 full-erp/
 ├── app/
@@ -242,7 +242,7 @@ full-erp/
    uvicorn app.main:app --reload
    ```
 
-### Fullstack Projects (Docker)
+### Modular Projects (Docker)
 
 1. **Start All Services**
    ```bash
@@ -272,7 +272,7 @@ MONGODB_URL=mongodb://localhost:27017/myproject  # Beanie
 SECRET_KEY=your-secret-key-here
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 
-# Redis (fullstack)
+# Redis (modular)
 REDIS_URL=redis://localhost:6379/0
 
 # Email (optional)
@@ -301,39 +301,18 @@ export DATABASE_URL=postgresql+asyncpg://user:password@localhost/myproject
 export MONGODB_URL=mongodb://localhost:27017/myproject
 ```
 
-## API Endpoints
-
-Generated projects include these endpoints:
-
-### Authentication
-- `POST /auth/jwt/login` - User login
-- `POST /auth/jwt/logout` - User logout
-- `POST /auth/register` - User registration
-- `POST /auth/forgot-password` - Request password reset
-- `POST /auth/reset-password` - Reset password
-
-### Users
-- `GET /users/me` - Get current user
-- `PATCH /users/me` - Update current user
-- `GET /users/{id}` - Get user by ID
-- `GET /users` - List users (admin only)
-
-
 ## Deployment
 
 ### Docker Deployment
 
-For fullstack projects:
+For modular projects:
 
 ```bash
 # Build and run
-docker-compose up -d --build
-
-# View logs
-docker-compose logs -f
+docker-compose -f docker-compose.dev.yaml up -d --build
 
 # Stop services
-docker-compose down
+docker-compose -f docker-compose.dev.yaml down
 ```
 
 ### Production Deployment
@@ -350,7 +329,7 @@ docker-compose down
    ```
 
 3. **Traefik Reverse Proxy**
-   Both templates includes Traefik configuration in `docker-compose.prod.yml`:
+   Includes Traefik configuration in `docker-compose.prod.yml`:
    ```yaml
    services:
      traefik:
