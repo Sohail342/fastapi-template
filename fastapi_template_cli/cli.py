@@ -3,6 +3,7 @@
 import typer
 from pathlib import Path
 from typing import Optional
+from importlib import metadata
 
 from fastapi_template_cli.renderer import TemplateRenderer, get_template_dir
 
@@ -167,7 +168,11 @@ def list_templates():
 @app.command()
 def version():
     """Show version information."""
-    typer.echo("FastAPI Template CLI v1.4.14")
+    try:
+        version = metadata.version("fastapi-template-cli")
+        typer.echo(f"FastAPI Template CLI version: {version}")
+    except metadata.PackageNotFoundError:
+        typer.echo("FastAPI Template CLI version: unknown (package not found)")
 
 
 @app.callback()
