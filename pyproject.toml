@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fastapi-template-cli"
-version = "2.0.0"
+version = "2.0.1"
 description = "A powerful CLI tool for generating production-ready FastAPI applications with SQLAlchemy and MongoDB support"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 license = "MIT"
 authors = [
-    {name = "FastAPI Template CLI", email = "sohailahmad34280@gmail.com"}
+    {name = "FastAPI Template CLI", email = "sohailahmad.dev@yahoo.com"}
 ]
 
 keywords = ["fastapi", "cli", "scaffold", "template", "python", "sqlalchemy", "mongodb", "beanie", "async"]
