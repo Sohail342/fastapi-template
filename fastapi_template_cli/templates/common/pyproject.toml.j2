@@ -20,7 +20,11 @@ dependencies = [
     "alembic>=1.15",
     {% endif %}
     {% if orm_type == "sqlalchemy" %}
-    "psycopg2-binary>=2.9",
+    "psycopg2-binary>=2.9.11",
+    "asyncpg>=0.31.0",
+    {% endif %}
+    {% if orm_type == "beanie" %}
+    "motor>=3.7.1",
     {% endif %}
     {% if project_type == "modular" %}
     {% if celery %}
